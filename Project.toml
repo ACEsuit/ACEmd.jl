@@ -3,6 +3,11 @@ uuid = "69e0c927-b120-467d-b2b3-5b6842148cf4"
 authors = ["Teemu Järvinen <teemu.j.jarvinen@gmail.com> and contributors"]
 version = "0.1.0-DEV"
 
+[deps]
+ACE1 = "e3f9bc04-086e-409a-ba78-e9769fe067bb"
+AtomsBase = "a963bdd2-2df7-4f54-a1ee-49d51e6be12a"
+CellListMap = "69e1c6dd-3888-40e6-b3c8-31ac5f578864"
+
 [compat]
 julia = "1.6"
 
