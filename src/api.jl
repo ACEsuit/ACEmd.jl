@@ -1,14 +1,7 @@
 import Base.Threads.@spawn
 
 
-@inline function ace_evaluate!(tmp, calc, R::AbstractVector, species::AbstractVector, species0 )
-    return ACE1.evaluate!(tmp, calc, R, species, species0)
-end
 
-function ace_evaluate(calc, R::AbstractVector, species::AbstractVector, species0)
-    tmp = ACE1.alloc_temp(calc, length(R))
-    return ace_evaluate!(tmp, calc, R, species, species0)
-end
 
 
 function energy_nonthreaded!(tmp, calc, at::Atoms; domain=1:length(at))
@@ -50,6 +43,10 @@ function energy(calc, at::Atoms; domain=1:length(at), executor=ThreadedEx())
     return Etot
 end
 
+
+
+
+
 function energy_floops(calc, at::Atoms; domain=1:length(at), executor=ThreadedEx())
     nlist = neighbourlist(at, cutoff(calc))
     @floop executor for i in domain
@@ -74,3 +71,17 @@ function energy_tasks(calc, at::Atoms; ntasks=1)
 end
 
 
+## forces
+
+function ace_forces(V, at::Atoms; domain=1:length(at), executor=ThreadedEx())
+    nlist = neighbourlist(at, cutoff(V))
+    F = Folds.sum( domain, executor ) do i
+        j, R, Z = neigsz(nlist, at, i)
+        _, tmp = ace_evaluate_d(V, R, Z, at.Z[i])
+        f = sum(tmp.dV) # = F[i]
+        s = SparseVector( length(at), collect(j), tmp.dV )
+        ss = SparseVector( length(at), [i], [f] )
+        ss - s
+    end
+    return Vector( F )
+end
