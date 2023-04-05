@@ -16,10 +16,10 @@ function neigsz!(tmp, nlist::PairList, at::Atoms, i::Integer)
  end
 
 
- function load_ace_model(fname; oldformat=false)
+ function load_ace_model(fname; old_format=false)
     pot_tmp = load_dict(fname)["IP"]
     pot = read_dict(pot_tmp)
-    if oldformat
+    if old_format
         return pot
     else
         return pot.components
