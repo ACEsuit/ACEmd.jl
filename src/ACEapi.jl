@@ -8,12 +8,14 @@ using FLoops
 using SparseArrays
 
 export ace_evaluate
-export energy
-export forces
-export virial
+export ace_energy
+export ace_forces
+export ace_virial
+export load_ace_model
 
 include("api.jl")
 include("backend.jl")
 include("utils.jl")
+include("experimental.jl")
 
 end

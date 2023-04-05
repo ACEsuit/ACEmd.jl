@@ -12,3 +12,14 @@ function neigsz!(tmp, nlist::PairList, at::Atoms, i::Integer)
     j, R = NeighbourLists.neigs(nlist, i)
     return j, R, at.Z[j]
  end
+
+
+ function load_ace_model(fname; oldformat=false)
+    pot_tmp = load_dict(fname)["IP"]
+    pot = read_dict(pot_tmp)
+    if oldformat
+        return pot
+    else
+        return pot.components
+    end
+ end
