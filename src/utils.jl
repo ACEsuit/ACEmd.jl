@@ -1,5 +1,6 @@
 
 function neigsz!(tmp, nlist::PairList, at::Atoms, i::Integer)
+    # from JuLIP
     j, R = neigs!(tmp.R, nlist, i)
     Z = tmp.Z
     for n in eachindex(j)
@@ -9,6 +10,7 @@ function neigsz!(tmp, nlist::PairList, at::Atoms, i::Integer)
  end
  
  function neigsz(nlist::PairList, at::Atoms, i::Integer)
+    # from JuLIP
     j, R = NeighbourLists.neigs(nlist, i)
     return j, R, at.Z[j]
  end

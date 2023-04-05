@@ -6,6 +6,7 @@ using CellListMap
 using Folds
 using FLoops
 using SparseArrays
+using StaticArrays
 
 export ace_evaluate
 export ace_energy
