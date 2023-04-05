@@ -73,6 +73,6 @@ function ace_virial(V, at::Atoms; domain=1:length(at), executor=ThreadedEx())
 end
 
 function ace_virial(::OneBody, at::Atoms; kwargs...)
-    T = (eltype∘eltype)(at.X)
+    T = (eltype ∘ eltype)(at.X)
     return SMatrix{3,3}(zeros(T, 3,3))
 end
