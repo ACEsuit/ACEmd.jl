@@ -46,7 +46,7 @@ function ace_forces(V, at::Atoms; domain=1:length(at), executor=ThreadedEx())
         end
         f
     end
-    return Vector( F )
+    return F
 end
 
 
