@@ -32,6 +32,10 @@ jobs:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
       - uses: julia-actions/cache@v1
+      - run: |
+          using Pkg
+          Pkg.pkg"registry add https://github.com/ACEsuit/ACEregistry"
+        shell: bash -c "julia --color=yes {0}"
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
   docs:
@@ -45,6 +49,10 @@ jobs:
       - uses: julia-actions/setup-julia@v1
         with:
           version: '1'
+      - run: |
+          using Pkg
+          Pkg.pkg"registry add https://github.com/ACEsuit/ACEregistry"
+        shell: bash -c "julia --color=yes {0}"
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-docdeploy@v1
         env:
