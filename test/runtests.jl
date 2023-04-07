@@ -4,8 +4,8 @@ using ACE1
 #using ExtXYZ
 using Test
 
-fname_ace = joinpath(pkgdir(ACEapi), "test", "data", "TiAl.json")
-fname_xyz = joinpath(pkgdir(ACEapi), "test", "data", "TiAl.xyz")
+fname_ace = joinpath(pkgdir(ACEapi), "data", "TiAl.json")
+fname_xyz = joinpath(pkgdir(ACEapi), "data", "TiAl.xyz")
 
 @testset "ACEapi.jl" begin
     # Write your tests here.
