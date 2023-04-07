@@ -7,6 +7,7 @@ using Folds
 using FLoops
 #using SparseArrays
 using StaticArrays
+using Unitful
 
 export ace_evaluate
 export ace_energy

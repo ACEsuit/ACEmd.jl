@@ -1,5 +1,5 @@
 
-function ace_energy(calc, at::Atoms; domain=1:length(at), executor=ThreadedEx())
+function ace_energy(calc, at; domain=1:length(at), executor=ThreadedEx())
     nlist = neighbourlist(at, cutoff(calc))
     Etot = Folds.sum( domain, executor ) do i
         _, R, Z = neigsz(nlist, at, i)
