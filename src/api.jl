@@ -1,9 +1,9 @@
 
 function ace_energy(calc, at; domain=1:length(at), executor=ThreadedEx())
-    nlist = neighbourlist(at, cutoff(calc))
+    nlist = neighborlist(at, cutoff(calc))
     Etot = Folds.sum( domain, executor ) do i
         _, R, Z = neigsz(nlist, at, i)
-        ace_evaluate(calc, R, Z, at.Z[i])
+        ace_evaluate(calc, R, Z, _atomic_number(at,i))
     end
     return Etot
 end

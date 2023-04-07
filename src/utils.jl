@@ -29,13 +29,13 @@ function neigsz!(tmp, nlist::PairList, at::Atoms, i::Integer)
 
  ## CellListMap
 
-function neighbourlist(ab::AbstractSystem, cutoff)
+neighborlist(at::Atoms, cutoff) = ACE1.neighbourlist(at, cutoff)
+
+function neighborlist(ab::AbstractSystem, cutoff)
     function push_pair!(i, j, x, y, d2, pairs, cutoff) 
         d = sqrt(d2)
         if d < cutoff
-            Δ = ustrip(y-x)
-            D = ustrip(d)
-            push!(pairs, (i, j, Δ, D))
+            push!(pairs, (i, j, ustrip(y-x)))
         end
         return pairs
     end
@@ -48,13 +48,11 @@ function neighbourlist(ab::AbstractSystem, cutoff)
     ucutoff = cutoff*u"Å"  # ACE cutoff is in Å
     tmp = bounding_box(ab)
     cell = [ tmp[i][i] for i in eachindex(tmp) ]
-    @info "cell = $cell"
-    @info "cutoff = $ucutoff"
 
     box = Box(cell, ucutoff)
     
     #TODO allow dynamic types here
-    pairs = Tuple{Int,Int, SVector{3, Float64}, Float64}[]
+    pairs = Tuple{Int,Int, SVector{3, Float64}}[]
 
     cl = CellList(position(ab), box, parallel=true)
 
@@ -68,7 +66,7 @@ function neighbourlist(ab::AbstractSystem, cutoff)
 end
 
 
-function filter_list(list, ab::AbstractSystem, i)
+function neigsz(list, ab::AbstractSystem, i)
     tmp = filter( x-> x[1] == i || x[2] == i, list )
 
     R = map( tmp ) do x
@@ -80,7 +78,10 @@ function filter_list(list, ab::AbstractSystem, i)
     end
 
     Z = map( j ) do k
-        ACE1.AtomicNumber(AtomsBase.atomic_number(ab,k))
+        _atomic_number(ab,k)
     end
     return j, R, Z
 end
+
+_atomic_number(at::Atoms, i)          = at.Z[i]
+_atomic_number(ab::AbstractSystem, i) = ACE1.AtomicNumber(AtomsBase.atomic_number(ab,i))
