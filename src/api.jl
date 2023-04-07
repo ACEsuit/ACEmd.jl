@@ -33,7 +33,7 @@ end
 ## forces
 
 function ace_forces(V, at::Atoms; domain=1:length(at), executor=ThreadedEx())
-    nlist = neighbourlist(at, cutoff(V))
+    nlist = neighborlist(at, cutoff(V))
     F = Folds.sum( domain, executor ) do i
         j, R, Z = neigsz(nlist, at, i)
         _, tmp = ace_evaluate_d(V, R, Z, at.Z[i])
@@ -60,7 +60,7 @@ end
 ## virial
 
 function ace_virial(V, at::Atoms; domain=1:length(at), executor=ThreadedEx())
-    nlist = neighbourlist(at, cutoff(V))
+    nlist = neighborlist(at, cutoff(V))
     vir = Folds.sum( domain, executor ) do i
         j, R, Z = neigsz(nlist, at, i)
         _, tmp = ace_evaluate_d(V, R, Z, at.Z[i])
