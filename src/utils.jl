@@ -29,9 +29,9 @@ function neigsz!(tmp, nlist::PairList, at::Atoms, i::Integer)
 
  ## CellListMap
 
-neighborlist(at::Atoms, cutoff) = ACE1.neighbourlist(at, cutoff)
+neighborlist(at::Atoms, cutoff; kwargs...) = ACE1.neighbourlist(at, cutoff; kwargs...)
 
-function neighborlist(ab::AbstractSystem, cutoff)
+function neighborlist(ab::AbstractSystem, cutoff; kwargs...)
     function push_pair!(i, j, x, y, d2, pairs, cutoff) 
         d = sqrt(d2)
         if d < cutoff
@@ -67,21 +67,26 @@ end
 
 
 function neigsz(list, ab::AbstractSystem, i)
-    tmp = filter( x-> x[1] == i || x[2] == i, list )
+    T = typeof( list[begin][3] )
+    R = T[]
+    j = Int[]
+    Z = JuLIP.AtomicNumber[]
 
-    R = map( tmp ) do x
-        x[1] == i ? x[3] : -x[3]
-    end
-
-    j = map( tmp ) do x
-        x[1] == i ? x[2] : x[1]
-    end
-
-    Z = map( j ) do k
-        _atomic_number(ab,k)
+    for x in list
+        if x[1] == i
+            push!(R, x[3])
+            push!(j, x[2])
+            push!(Z, _atomic_number(ab,x[2]))
+        elseif x[2] == i
+            push!(R, -x[3])
+            push!(j, x[1])
+            push!(Z, _atomic_number(ab,x[1]))
+        end
     end
     return j, R, Z
 end
+
+
 
 _atomic_number(at::Atoms, i)          = at.Z[i]
 _atomic_number(ab::AbstractSystem, i) = ACE1.AtomicNumber(AtomsBase.atomic_number(ab,i))
