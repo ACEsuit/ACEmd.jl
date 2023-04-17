@@ -35,7 +35,7 @@ function neighborlist(ab::AbstractSystem, cutoff; kwargs...)
     function push_pair!(i, j, x, y, d2, pairs, cutoff) 
         d = sqrt(d2)
         if d < cutoff
-            push!(pairs, (i, j, ustrip(y-x)))
+            push!(pairs, (i, j, ustrip.(y-x)))
         end
         return pairs
     end
