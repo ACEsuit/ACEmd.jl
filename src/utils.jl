@@ -22,7 +22,7 @@ function neigsz!(tmp, nlist::PairList, at::Atoms, i::Integer)
     if old_format
         return pot
     else
-        return pot.components
+        return ACEpotential(pot.components)
     end
  end
 
