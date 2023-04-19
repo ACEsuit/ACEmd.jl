@@ -24,9 +24,9 @@ export ace_energy_forces
 export ace_energy_forces_virial
 export ace_forces_virial
 
+include("structs.jl")
 include("api.jl")
 include("backend.jl")
-include("structs.jl")
 include("utils.jl")
 include("experimental.jl")
 

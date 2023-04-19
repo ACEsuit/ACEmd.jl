@@ -1,10 +1,11 @@
 
-function ace_energy(calc, at; domain=1:length(at), executor=ThreadedEx())
+function ace_energy(calc::AbstractCalculator, at; domain=1:length(at), executor=ThreadedEx())
     nlist = neighborlist(at, cutoff(calc); storelist=false)
     Etot = Folds.sum( domain, executor ) do i
         _, R, Z = neigsz(nlist, at, i)
         ace_evaluate(calc, R, Z, _atomic_number(at,i))
     end
+    @info "done"
     return Etot
 end
 
@@ -39,7 +40,7 @@ end
 
 ## forces
 
-function ace_forces(V, at; domain=1:length(at), executor=ThreadedEx())
+function ace_forces(V::AbstractCalculator, at; domain=1:length(at), executor=ThreadedEx())
     nlist = neighborlist(at, cutoff(V))
     F = Folds.sum( domain, executor ) do i
         j, R, Z = neigsz(nlist, at, i)
@@ -72,7 +73,7 @@ end
 
 ## virial
 
-function ace_virial(V, at; domain=1:length(at), executor=ThreadedEx())
+function ace_virial(V::AbstractCalculator, at; domain=1:length(at), executor=ThreadedEx())
     nlist = neighborlist(at, cutoff(V))
     vir = Folds.sum( domain, executor ) do i
         j, R, Z = neigsz(nlist, at, i)
