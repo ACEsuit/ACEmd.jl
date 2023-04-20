@@ -5,7 +5,6 @@ function ace_energy(calc::AbstractCalculator, at; domain=1:length(at), executor=
         _, R, Z = neigsz(nlist, at, i)
         ace_evaluate(calc, R, Z, _atomic_number(at,i))
     end
-    @info "done"
     return Etot
 end
 

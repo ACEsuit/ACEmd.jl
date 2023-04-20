@@ -8,6 +8,7 @@ using FLoops
 #using SparseArrays
 using StaticArrays
 using Unitful
+using UnitfulAtomic
 
 
 # functions
@@ -29,5 +30,7 @@ include("api.jl")
 include("backend.jl")
 include("utils.jl")
 include("experimental.jl")
+
+function ase_ace_calculator end
 
 end
