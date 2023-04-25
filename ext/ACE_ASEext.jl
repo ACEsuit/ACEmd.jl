@@ -35,7 +35,8 @@ ACEcalculator = pytype("ACEcalculator", (Calculator,),[
 
             if "forces" in properties
                 F = ace_energy(pyconvert(ACEpotential,self.potential), pyconvert(AbstractSystem, atoms))
-                self.results["forces"] = F  #TODO add unit conversion
+                conv = ustrip(u"eV/Å", 1u"hartree/Å")
+                self.results["forces"] = F * conv
             end
         end
 
