@@ -18,8 +18,7 @@ ASEconvert = "3da9722f-58c2-4165-81be-b4d7253e8fd2"
 PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
 
 [extensions]
-ACE_ASE_ext = ["ASEconvert", "PythonCall"]
-no-ext = "ASEconvert"
+ACE_ASEext = ["ASEconvert", "PythonCall"]
 
 [compat]
 ACE1 = "0.11.5"

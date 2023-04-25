@@ -1,4 +1,4 @@
-module ASEext
+module ACE_ASEext
 
 using ACEapi
 using AtomsBase
@@ -6,8 +6,6 @@ using ASEconvert
 using Unitful
 using UnitfulAtomic
 using PythonCall
-
-@info "ASEext loaded"
 
 calculator = pyimport("ase.calculators.calculator")
 Calculator = calculator.Calculator
@@ -34,7 +32,7 @@ ACEcalculator = pytype("ACEcalculator", (Calculator,),[
             end
 
             if "forces" in properties
-                F = ace_energy(pyconvert(ACEpotential,self.potential), pyconvert(AbstractSystem, atoms))
+                F = ace_forces(pyconvert(ACEpotential,self.potential), pyconvert(AbstractSystem, atoms))
                 conv = ustrip(u"eV/Å", 1u"hartree/Å")
                 self.results["forces"] = F * conv
             end
