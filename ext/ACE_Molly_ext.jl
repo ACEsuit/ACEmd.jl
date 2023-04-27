@@ -5,7 +5,8 @@ using ACEapi
 using CellListMap
 using Folds
 using Molly
-
+using Unitful
+using UnitfulAtomic
 
 
 function Molly.forces(
@@ -28,17 +29,19 @@ function Molly.potential_energy(
     # sys has atoms for atom identy data
     # coords for coordinates
     # and boundary for boundary conditions
-    return ace_energy(acp, sys)
+
+    # ACE has hartree units
+    return ace_energy(acp, sys) * 2625.5u"kJ/mol"
 end
     
 
-function CellListMap.neighborlist(sys::MollySystem, cutoff; kwargs...)
+function CellListMap.neighborlist(sys::Molly.System, cutoff; kwargs...)
     cell = sys.boundary.side_lengths
     list = CellListMap.neighborlist(sys.coords, cutoff; unitcell=cell)
     return list
 end
 
-function _atomic_number(sys::System, i) 
+function ACEapi._atomic_number(sys::Molly.System, i) 
     return ACE1.AtomicNumber( sys.atoms_data[i] )
 end
 
