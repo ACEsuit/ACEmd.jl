@@ -14,11 +14,12 @@ function Molly.forces(
         acp::ACEpotential,
         sys,
         neighbors=nothing;
-        n_threads=Threads.nthreads())
+        n_threads=nothing,
+        executor=ThreadedEx())
     # sys has atoms for atom identy data
     # coords for coordinates
     # and boundary for boundary conditions
-    return ace_forces(acp, sys) *u"hartree/Å" * Nₐ
+    return ace_forces(acp, sys; executor=executor) *u"hartree/Å" * Nₐ
 end
 
 
@@ -26,23 +27,19 @@ function Molly.potential_energy(
         acp::ACEpotential,
         sys,
         neighbors=nothing;
-        n_threads=Threads.nthreads())
+        n_threads=nothing,
+        executor=ThreadedEx()
+        )
     # sys has atoms for atom identy data
     # coords for coordinates
     # and boundary for boundary conditions
 
-    return ace_energy(acp, sys) * u"hartree" * Nₐ
+    return ace_energy(acp, sys; executor=executor) * u"hartree" * Nₐ
 end
-    
-
-function CellListMap.neighborlist(sys::Molly.System, cutoff; kwargs...)
-    cell = sys.boundary.side_lengths
-    list = CellListMap.neighborlist(sys.coords, cutoff; unitcell=cell)
-    return list
-end
+ 
 
 function ACEapi._atomic_number(sys::Molly.System, i) 
-    return ACE1.AtomicNumber( sys.atoms_data[i] )
+    return ACE1.AtomicNumber( sys.atoms_data[i].Z )
 end
 
 end # Module
