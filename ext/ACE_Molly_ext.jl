@@ -8,6 +8,7 @@ using Molly
 using Unitful
 using UnitfulAtomic
 
+const Nₐ = 6.022140857e23u"mol^-1"
 
 function Molly.forces(
         acp::ACEpotential,
@@ -17,7 +18,7 @@ function Molly.forces(
     # sys has atoms for atom identy data
     # coords for coordinates
     # and boundary for boundary conditions
-    return ace_forces(acp, sys)
+    return ace_forces(acp, sys) *u"hartree/Å" * Nₐ
 end
 
 
@@ -30,8 +31,7 @@ function Molly.potential_energy(
     # coords for coordinates
     # and boundary for boundary conditions
 
-    # ACE has hartree units
-    return ace_energy(acp, sys) * 2625.5u"kJ/mol"
+    return ace_energy(acp, sys) * u"hartree" * Nₐ
 end
     
 

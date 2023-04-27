@@ -7,16 +7,16 @@ function neigsz!(tmp, nlist::PairList, at::Atoms, i::Integer)
        Z[n] = at.Z[j[n]]
     end
     return j, R, (@view Z[1:length(j)])
- end
+end
  
- function neigsz(nlist::PairList, at::Atoms, i::Integer)
+function neigsz(nlist::PairList, at::Atoms, i::Integer)
     # from JuLIP
     j, R = NeighbourLists.neigs(nlist, i)
     return j, R, at.Z[j]
- end
+end
 
 
- function load_ace_model(fname; old_format=false)
+function load_ace_model(fname; old_format=false)
     pot_tmp = load_dict(fname)["IP"]
     pot = read_dict(pot_tmp)
     if old_format
@@ -24,7 +24,7 @@ function neigsz!(tmp, nlist::PairList, at::Atoms, i::Integer)
     else
         return ACEpotential(pot.components)
     end
- end
+end
 
 
  ## CellListMap
