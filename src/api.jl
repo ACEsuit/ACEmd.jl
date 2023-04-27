@@ -25,7 +25,7 @@ end
 # Generate interface for multiple potentials
 for ace_method in [ :ace_energy, :ace_forces, :ace_virial ]
     @eval begin
-        function $ace_method(calc::AbstractArray, at; domain=1:length(at), executor=ThreadedEx())
+        function $ace_method(calc::Union{AbstractArray, ACEpotential}, at; domain=1:length(at), executor=ThreadedEx())
             tmp = asyncmap( calc ) do V
                 $ace_method(V, at; domain=domain, executor=executor)
             end
