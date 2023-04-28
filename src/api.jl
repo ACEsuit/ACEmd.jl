@@ -17,7 +17,7 @@ end
 
 function ace_energy(V::OneBody, as::AbstractSystem; domain=1:length(as), executor=nothing)
     E = sum( domain ) do i
-        ACE1.evaluate(V, atomic_symbol(as[i]) )
+        ACE1.evaluate(V, atomic_symbol(as, i) )
     end
     return E
 end
@@ -25,7 +25,7 @@ end
 # Generate interface for multiple potentials
 for ace_method in [ :ace_energy, :ace_forces, :ace_virial ]
     @eval begin
-        function $ace_method(calc::AbstractArray, at; domain=1:length(at), executor=ThreadedEx())
+        function $ace_method(calc::Union{AbstractArray, ACEpotential}, at; domain=1:length(at), executor=ThreadedEx())
             tmp = asyncmap( calc ) do V
                 $ace_method(V, at; domain=domain, executor=executor)
             end
@@ -64,7 +64,7 @@ function ace_forces(::OneBody, at::Atoms; kwargs...)
 end
 
 function ace_forces(::OneBody, as::AbstractSystem; kwargs...)
-    T = eltype( ustrip.( position( as[begin] ) )  )
+    T = eltype( ustrip.( position(as, 1) )  )
     F = [ SVector{3}( zeros(T, 3) ) for _ in 1:length(as) ]
     return F
 end
