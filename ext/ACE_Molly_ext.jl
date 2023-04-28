@@ -8,18 +8,15 @@ using Molly
 using Unitful
 using UnitfulAtomic
 
-const Nₐ = 6.022140857e23u"mol^-1"
 
 function Molly.forces(
         acp::ACEpotential,
         sys,
         neighbors=nothing;
         n_threads=nothing,
-        executor=ThreadedEx())
-    # sys has atoms for atom identy data
-    # coords for coordinates
-    # and boundary for boundary conditions
-    return ace_forces(acp, sys; executor=executor) *u"hartree/Å" * Nₐ
+        executor=ThreadedEx()
+    )
+    return ace_forces(acp, sys; executor=executor) *u"hartree/Å"
 end
 
 
@@ -29,12 +26,8 @@ function Molly.potential_energy(
         neighbors=nothing;
         n_threads=nothing,
         executor=ThreadedEx()
-        )
-    # sys has atoms for atom identy data
-    # coords for coordinates
-    # and boundary for boundary conditions
-
-    return ace_energy(acp, sys; executor=executor) * u"hartree" * Nₐ
+    )
+    return ace_energy(acp, sys; executor=executor) * u"hartree"
 end
  
 
