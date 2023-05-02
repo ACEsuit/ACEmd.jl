@@ -18,19 +18,6 @@ data = FastSystem(ExtXYZ.Atoms(read_frame(fname_xyz)))
 data_huge = FastSystem(ExtXYZ.Atoms(read_frame(fname_xyz_huge)))
 
 
-function serial_energy(pot, data)
-    return sum(  pot  ) do p
-        ace_energy(p, data)
-    end
-end
-
-function serial_forces(pot, data)
-    return sum(  pot  ) do p
-        ace_forces(p, data)
-    end
-end
-
-
 
 SUITE["JuLIP"] = BenchmarkGroup(["JuLIP","Modes", "Size"])
 SUITE["AtomsBase"] = BenchmarkGroup(["AtomsBase", "Modes", "Size"])
@@ -50,5 +37,21 @@ SUITE["JuLIP", "virial", "huge"] = @benchmarkable ACE1.virial($pot_julip, $data_
 SUITE["AtomsBase", "virial", "big"] = @benchmarkable ace_virial($pot, $data)
 SUITE["AtomsBase", "virial", "huge"] = @benchmarkable ace_virial($pot, $data_huge)
 
-SUITE["AtomsBase", "energy serial", "big"] = @benchmarkable serial_energy($pot, $data)
-SUITE["AtomsBase", "forces serial", "big"] = @benchmarkable serial_forces($pot, $data)
+
+
+## These test serial calculations compared to default async
+## They should be always slower so skipping them here
+# function serial_energy(pot, data)
+#     return sum(  pot  ) do p
+#         ace_energy(p, data)
+#     end
+# end
+
+# function serial_forces(pot, data)
+#     return sum(  pot  ) do p
+#         ace_forces(p, data)
+#     end
+# end
+
+#SUITE["AtomsBase", "energy serial", "big"] = @benchmarkable serial_energy($pot, $data)
+#SUITE["AtomsBase", "forces serial", "big"] = @benchmarkable serial_forces($pot, $data)
