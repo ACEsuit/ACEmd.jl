@@ -20,6 +20,7 @@ jobs:
           Pkg.pkg"add AtomsBase"
           Pkg.pkg"add ACE1"
           Pkg.pkg"add PkgBenchmark BenchmarkCI@0.1"
+        shell: bash -c "julia --color=yes {0}"
       - name: Run benchmarks
         run: julia -e 'using BenchmarkCI; BenchmarkCI.judge()'
       - name: Post results
