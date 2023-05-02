@@ -11,9 +11,13 @@ jobs:
       - uses: julia-actions/setup-julia@latest
         with:
           version: 1.9.0-rc3
+      - run: |
+          using Pkg
+          Pkg.pkg"registry add https://github.com/ACEsuit/ACEregistry"
+        shell: bash -c "julia --color=yes {0}"
       - uses: julia-actions/julia-buildpkg@latest
       - name: Install dependencies
-        run: julia -e 'using Pkg; Pkg.pkg"registry add https://github.com/ACEsuit/ACEregistry"; Pkg.pkg"add ExtXYZ AtomsBase ACE1 PkgBenchmark BenchmarkCI@0.1"'
+        run: julia -e 'using Pkg; Pkg.pkg"add ExtXYZ AtomsBase ACE1 PkgBenchmark BenchmarkCI@0.1"'
       - name: Run benchmarks
         run: julia -e 'using BenchmarkCI; BenchmarkCI.judge()'
       - name: Post results
