@@ -3,3 +3,5 @@
 /docs/Manifest.toml
 local
 .vscode
+/.benchmarkci
+/benchmark/*.json
