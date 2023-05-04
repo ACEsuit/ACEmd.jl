@@ -19,10 +19,10 @@ jobs:
         shell: bash -c "julia --color=yes {0}"
       - uses: julia-actions/julia-buildpkg@latest
       - name: Install dependencies
-        run: julia -e 'using Pkg; Pkg.add(["PkgBenchmark", "BenchmarkCI"])'
+        run: julia -t2 -e 'using Pkg; Pkg.add(["PkgBenchmark", "BenchmarkCI"])'
       - name: Run benchmarks
-        run: julia -e 'using BenchmarkCI; BenchmarkCI.judge(baseline = "origin/main")'
+        run: julia -t2 -e 'using BenchmarkCI; BenchmarkCI.judge(baseline = "origin/main")'
       - name: Post results
-        run: julia -e 'using BenchmarkCI; BenchmarkCI.displayjudgement(); BenchmarkCI.postjudge()'
+        run: julia -t2 -e 'using BenchmarkCI; BenchmarkCI.displayjudgement(); BenchmarkCI.postjudge()'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
