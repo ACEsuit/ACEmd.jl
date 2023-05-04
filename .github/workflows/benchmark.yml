@@ -4,6 +4,9 @@ on:
   pull_request:
     types: [labeled, opened, synchronize, reopened]
 
+env:
+  JULIA_NUM_THREADS: 2
+
 jobs:
   Benchmark:
     runs-on: ubuntu-latest
@@ -19,10 +22,10 @@ jobs:
         shell: bash -c "julia --color=yes {0}"
       - uses: julia-actions/julia-buildpkg@latest
       - name: Install dependencies
-        run: julia -t2 -e 'using Pkg; Pkg.add(["PkgBenchmark", "BenchmarkCI"])'
+        run: julia -e 'using Pkg; Pkg.add(["PkgBenchmark", "BenchmarkCI"])'
       - name: Run benchmarks
-        run: julia -t2 -e 'using BenchmarkCI; BenchmarkCI.judge(baseline = "origin/main")'
+        run: julia -e 'using BenchmarkCI; BenchmarkCI.judge(baseline = "origin/main")'
       - name: Post results
-        run: julia -t2 -e 'using BenchmarkCI; BenchmarkCI.displayjudgement(); BenchmarkCI.postjudge()'
+        run: julia -e 'using BenchmarkCI; BenchmarkCI.displayjudgement(); BenchmarkCI.postjudge()'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
