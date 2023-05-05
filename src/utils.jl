@@ -9,10 +9,12 @@ function neigsz!(tmp, nlist::PairList, at::Atoms, i::Integer)
     return j, R, (@view Z[1:length(j)])
 end
  
-function neigsz(nlist::PairList, at::Atoms, i::Integer)
-    # from JuLIP
+function neigsz(nlist::PairList, at, i::Integer)
     j, R = NeighbourLists.neigs(nlist, i)
-    return j, R, at.Z[j]
+    Z = map(j) do k
+        _atomic_number(at, k)
+    end
+    return j, R, Z 
 end
 
 
@@ -27,11 +29,26 @@ function load_ace_model(fname; old_format=false)
 end
 
 
+function neighborlist(ab::AbstractSystem, cutoff; kwargs...)
+    cell = ustrip.( u"Å", hcat( bounding_box(ab)... ) )
+    pbc = map( boundary_conditions(ab) ) do x
+        x == Periodic()
+    end
+    r = map( 1:length(ab)) do i 
+        ustrip.(u"Å", position(ab,i))
+    end
+    nlist = PairList(r, cutoff, cell, pbc; int_type=Int)
+    return nlist
+end
+
+
+
  ## CellListMap
 
 neighborlist(at::Atoms, cutoff; kwargs...) = ACE1.neighbourlist(at, cutoff; kwargs...)
 
-function neighborlist(ab::AbstractSystem, cutoff; kwargs...)
+
+function neighborlist_clm(ab::AbstractSystem, cutoff; kwargs...)
     function push_pair!(i, j, x, y, d2, pairs, cutoff) 
         d = sqrt(d2)
         if d < cutoff
@@ -66,7 +83,7 @@ function neighborlist(ab::AbstractSystem, cutoff; kwargs...)
 end
 
 
-function neigsz(list, ab::AbstractSystem, i)
+function neigsz(list, ab, i)
     T = typeof( list[begin][3] )
     R = T[]
     j = Int[]
