@@ -19,8 +19,14 @@ end
 
 
 function load_ace_model(fname; old_format=false)
-    pot_tmp = load_dict(fname)["IP"]
-    pot = read_dict(pot_tmp)
+    pot_tmp = load_dict(fname)
+    if haskey(pot_tmp, "IP")
+        pot = read_dict(pot_tmp["IP"])
+    elseif haskey(pot_tmp, "potential")
+        pot = read_dict(pot_tmp["potential"])
+    else
+        error("Potential format not recognised")
+    end
     if old_format
         return pot
     else
@@ -29,13 +35,15 @@ function load_ace_model(fname; old_format=false)
 end
 
 
-function neighborlist(ab::AbstractSystem, cutoff; kwargs...)
+function neighborlist(ab, cutoff; kwargs...)
     cell = ustrip.( u"Å", hcat( bounding_box(ab)... ) )
     pbc = map( boundary_conditions(ab) ) do x
         x == Periodic()
     end
-    r = map( 1:length(ab)) do i 
-        ustrip.(u"Å", position(ab,i))
+    r = map( 1:length(ab)) do i
+        # Need to have SVector here for PairList to work
+        # if position does not give SVector
+        SVector( ustrip.(u"Å", position(ab,i))...)
     end
     nlist = PairList(r, cutoff, cell, pbc; int_type=Int)
     return nlist
