@@ -1,12 +1,12 @@
 # ACE in Molly
 
 ACE support for [Molly](https://github.com/JuliaMolSim/Molly.jl) is loaded with Julia package extensions.
-To use you need to use at least v1.9 of Julia.
+To use you need to use at least v1.9 of Julia. You also need to have both Molly and ACEapi added to the environment you are using, for extension to be loaded.
 
 There are couple of notes that need to be understood.
-- Default unit for energy in Molly is kJ/mol. You need to change this to anything that is not per mole (same for force units)
-- As of writing this Molly does not have fully compatable AtomsBase interface. So building `System` structure is a bit clunky. Most of all, `atoms_data` needs to have defined `element` for atomic symbol and `Z` for nuclear charge. As these are needed by ACE.
 
+- Default unit for energy in Molly is kJ/mol. You need to change this to anything that is not per mole (same for force units)
+- As of writing this Molly does not have fully compatible AtomsBase interface. So building `System` structure is a bit clunky. Most of all, `atoms_data` needs to have defined `element` for atomic symbol and `Z` for nuclear charge. As these are needed by ACE.
 
 ## Example
 
@@ -36,7 +36,7 @@ end
 
 atom_data = [ (; :Z=>z,:element=>s)  for (z,s) in zip(atomic_number(data), atomic_symbol(data))  ]
 
-# Set up temperature and velocites
+# Set up temperature and velocities
 temp = 298.0u"K"
 velocities = [random_velocity(m, temp) for m in atomic_mass(data)]
 
@@ -63,4 +63,3 @@ sys = System(
 # Perform MD
 simulate!(sys, simulator, 1000)
 ```
-
