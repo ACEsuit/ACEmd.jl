@@ -12,7 +12,7 @@ There are couple of notes that need to be understood.
 
 ```julia
 using Molly
-using ACEMD
+using ACEmd
 
 using AtomsBase
 using ExtXYZ
@@ -20,8 +20,8 @@ using Unitful
 
 
 # Load ACE data and initial structure
-fname_ace = joinpath(pkgdir(ACEMD), "data", "TiAl.json")
-fname_xyz = joinpath(pkgdir(ACEMD), "data", "TiAl-big.xyz")
+fname_ace = joinpath(pkgdir(ACEmd), "data", "TiAl.json")
+fname_xyz = joinpath(pkgdir(ACEmd), "data", "TiAl-big.xyz")
 
 data = FastSystem(ExtXYZ.Atoms(read_frame(fname_xyz)))
 pot = load_ace_model(fname_ace)

@@ -1,16 +1,16 @@
-using ACEMD
+using ACEmd
 using Documenter
 
-DocMeta.setdocmeta!(ACEMD, :DocTestSetup, :(using ACEMD); recursive=true)
+DocMeta.setdocmeta!(ACEmd, :DocTestSetup, :(using ACEmd); recursive=true)
 
 makedocs(;
-    modules=[ACEMD],
+    modules=[ACEmd],
     authors="Teemu Järvinen <teemu.j.jarvinen@gmail.com> and contributors",
-    repo="https://github.com/tjjarvinen/ACEMD.jl/blob/{commit}{path}#{line}",
-    sitename="ACEMD.jl",
+    repo="https://github.com/acesuit/ACEmd.jl/blob/{commit}{path}#{line}",
+    sitename="ACEmd.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://tjjarvinen.github.io/ACEMD.jl",
+        canonical="https://acesuit.github.io/ACEmd.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -21,6 +21,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/tjjarvinen/ACEMD.jl",
+    repo="github.com/acesuit/ACEmd.jl",
     devbranch="main",
 )
