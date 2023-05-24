@@ -1,7 +1,7 @@
 module ACE_Molly_ext
 
 using ACE1
-using ACEapi
+using ACEMD
 using CellListMap
 using Folds
 using Molly
