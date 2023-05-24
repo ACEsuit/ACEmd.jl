@@ -1,23 +1,23 @@
 ```@meta
-CurrentModule = ACEMD
+CurrentModule = ACEmd
 ```
 
-# ACEMD
+# ACEmd
 
-Documentation for [ACEMD](https://github.com/tjjarvinen/ACEMD.jl).
+Documentation for [ACEmd](https://github.com/acesuit/ACEmd.jl).
 
 The main structure is now functional, but testing is still needed.
 
 ### Example use case
 
 ```julia
-using ACEMD
+using ACEmd
 using AtomsBase
 using ExtXYZ
 
 # Load potential and atomic structure
-fname_ace = joinpath(pkgdir(ACEMD), "data", "TiAl.json")
-fname_xyz = joinpath(pkgdir(ACEMD), "data", "TiAl-big.xyz")
+fname_ace = joinpath(pkgdir(ACEmd), "data", "TiAl.json")
+fname_xyz = joinpath(pkgdir(ACEmd), "data", "TiAl-big.xyz")
 
 data = FastSystem(ExtXYZ.Atoms(read_frame(fname_xyz)))
 pot = load_ace_model(fname_ace)
@@ -33,5 +33,5 @@ ace_virial(pot, data)
 ```
 
 ```@autodocs
-Modules = [ACEMD]
+Modules = [ACEmd]
 ```
