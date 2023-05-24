@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: julia-actions/setup-julia@latest
         with:
-          version: 1.9.0-rc3
+          version: 1
       - run: |
           using Pkg
           Pkg.pkg"registry add https://github.com/ACEsuit/ACEregistry"
