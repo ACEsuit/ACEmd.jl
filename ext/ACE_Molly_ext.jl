@@ -1,7 +1,7 @@
 module ACE_Molly_ext
 
 using ACE1
-using ACEapi
+using ACEMD
 using CellListMap
 using Folds
 using Molly
@@ -31,7 +31,7 @@ function Molly.potential_energy(
 end
  
 
-function ACEapi._atomic_number(sys::Molly.System, i) 
+function ACEMD._atomic_number(sys::Molly.System, i) 
     return ACE1.AtomicNumber( sys.atoms_data[i].Z )
 end
 

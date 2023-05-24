@@ -1,4 +1,4 @@
-using ACEapi
+using ACEMD
 using ACE1
 using AtomsBase
 using ExtXYZ
@@ -7,8 +7,8 @@ using Unitful
 using UnitfulAtomic
 using Test
 
-fname_ace = joinpath(pkgdir(ACEapi), "data", "TiAl.json")
-fname_xyz = joinpath(pkgdir(ACEapi), "data", "TiAl-big.xyz")
+fname_ace = joinpath(pkgdir(ACEMD), "data", "TiAl.json")
+fname_xyz = joinpath(pkgdir(ACEMD), "data", "TiAl-big.xyz")
 
 
 @testset "JuLIP comparison" begin
