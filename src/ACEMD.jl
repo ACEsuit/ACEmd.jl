@@ -1,4 +1,4 @@
-module ACEapi
+module ACEMD
 
 using ACE1
 using AtomsBase

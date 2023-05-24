@@ -31,7 +31,7 @@ function Molly.potential_energy(
 end
  
 
-function ACEapi._atomic_number(sys::Molly.System, i) 
+function ACEMD._atomic_number(sys::Molly.System, i) 
     return ACE1.AtomicNumber( sys.atoms_data[i].Z )
 end
 
