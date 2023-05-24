@@ -1,7 +1,7 @@
 name = "ACEMD"
 uuid = "69e0c927-b120-467d-b2b3-5b6842148cf4"
 authors = ["Teemu Järvinen <teemu.j.jarvinen@gmail.com> and contributors"]
-version = "0.1.0-DEV"
+version = "0.1.0"
 
 [deps]
 ACE1 = "e3f9bc04-086e-409a-ba78-e9769fe067bb"
@@ -22,7 +22,15 @@ ACE_Molly_ext = "Molly"
 
 [compat]
 ACE1 = "0.11.5"
+AtomsBase = "0.3"
+CellListMap = "0.8"
+Folds = "0.2"
+Floops = "0.2"
 Molly ="0.15, 0.16"
+NeighbourLists = "0.5"
+StaticArrays = "1"
+Unitful = "1"
+UnitfulAtomic = "1"
 julia = "1.9"
 
 [extras]
