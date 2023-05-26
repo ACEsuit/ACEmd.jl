@@ -10,7 +10,7 @@ makedocs(;
     sitename="ACEmd.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://acesuit.github.io/ACEmd.jl",
+        canonical="https://ACEsuit.github.io/ACEmd.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -21,6 +21,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/acesuit/ACEmd.jl",
+    repo="github.com/ACEsuit/ACEmd.jl",
     devbranch="main",
 )
