@@ -78,6 +78,8 @@ j = judge(ACEmd, "origin/main")
 show(j.benchmarkgroup)
 ```
 
+Note that `BenchmarkConfig` takes parameter `id`, which controls wich branch is used for the benchmark.
+
 
 ## CI Benchmarks on Pull Requests
 
