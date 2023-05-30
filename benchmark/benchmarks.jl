@@ -1,14 +1,14 @@
 using BenchmarkTools
-using ACEMD
+using ACEmd
 using ACE1
 using ExtXYZ
 using AtomsBase
 
 SUITE = BenchmarkGroup()
 
-fname_ace = joinpath(pkgdir(ACEMD), "data", "TiAl.json")
-fname_xyz = joinpath(pkgdir(ACEMD), "data", "TiAl-big.xyz")
-fname_xyz_huge = joinpath(pkgdir(ACEMD), "data", "TiAl-huge.xyz")
+fname_ace = joinpath(pkgdir(ACEmd), "data", "TiAl.json")
+fname_xyz = joinpath(pkgdir(ACEmd), "data", "TiAl-big.xyz")
+fname_xyz_huge = joinpath(pkgdir(ACEmd), "data", "TiAl-huge.xyz")
 
 pot = load_ace_model(fname_ace)
 pot_julip = load_ace_model(fname_ace; old_format=true)
