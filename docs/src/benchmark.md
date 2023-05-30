@@ -43,18 +43,42 @@ In the benchmarks there are two system sizes "big" and "huge", which correspond 
 
 ## Controlling number of threads and other parameters
 
+The default config uses current Julia parameters to run the config.
+You can create your own configs with [BenchmarkConfig](https://juliaci.github.io/PkgBenchmark.jl/stable/run_benchmarks/#PkgBenchmark.BenchmarkConfig)
+
+```julia
+t2 = BenchmarkConfig(env = Dict("JULIA_NUM_THREADS" => 2))
+benchmarkpkg(ACEmd, t2)
+```
 
 
-## Comparing results to other branches
 
-You can use [BenchmarkCI](https://github.com/JuliaCI/PkgBenchmark.jl) to compare benchmarks to other branches. This is useful only for `ACEmd` development.
+## Comparing results
+
+You can use `judge` function to compare benchmarks with different setups or to other branches.
+
+```julia
+t4 = BenchmarkConfig(env = Dict("JULIA_NUM_THREADS" => 4))
+t8 = BenchmarkConfig(env = Dict("JULIA_NUM_THREADS" => 8))
+
+# Compare how much changing from 4-threads to 8 improves the performance
+j = judge(ACEmd, t8, t4)
+
+show(j.benchmarkgroup)
+```
+
+
+Compare current branch to "origin/main"
 
 Note, you need to commit all the changes you made!
 
+
 ```julia
-BenchmarkCI
-judge(ACEmd, "origin/main")
-displayjudgement()
+j = judge(ACEmd, "origin/main")
+show(j.benchmarkgroup)
 ```
+
+
+## CI Benchmarks on Pull Requests
 
 When making PRs you have an option to add "Run Benchmarks" label to make CI run the benchmark. This should be done every time, when change is made on how calculations are run in `ACEmd`.
