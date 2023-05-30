@@ -53,7 +53,7 @@ Note, you need to commit all the changes you made!
 
 ```julia
 BenchmarkCI
-BenchmarkCI.judge(baseline = "origin/main")
+judge(ACEmd, "origin/main")
 displayjudgement()
 ```
 
