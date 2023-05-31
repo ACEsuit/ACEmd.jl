@@ -18,14 +18,14 @@ using ACEmd
 using BenchmarkTools
 using PkgBenchmark
 
-bench = benchmark(ACEmd)
+bench = benchmarkpkg(ACEmd)
 results = bench.benchmarkgroup
 ```
 
 You can inspect the results using [@tagged](https://juliaci.github.io/BenchmarkTools.jl/stable/manual/#Indexing-into-a-BenchmarkGroup-using-@tagged) macro from [BenchmarkTools](https://github.com/JuliaCI/BenchmarkTools.jl)
 
 ```julia
-julia> results[@tagged "energy"][@tagged "AtomsBase"]
+julia> results[@tagged "energy" && "AtomsBase"]
 1-element BenchmarkTools.BenchmarkGroup:
   tags: []
   "AtomsBase" => 1-element BenchmarkTools.BenchmarkGroup:
@@ -84,3 +84,34 @@ Note that `BenchmarkConfig` takes parameter `id`, which controls wich branch is 
 ## CI Benchmarks on Pull Requests
 
 When making PRs you have an option to add "Run Benchmarks" label to make CI run the benchmark. This should be done every time, when change is made on how calculations are run in `ACEmd`.
+
+
+## Benchmark Scripts
+
+In `scripts/` folder has a script file that can be used to benchmark scaling. To use it just
+
+```julia
+using ACEmd
+include( joinpath(pkgdir(ACEmd), "scripts", "benchmark.jl") )
+
+# For 1, 2, 4 and 8 threads
+results = bench_scaling([1,2,4,8]) 
+
+# Plot results using UnicodePlots
+p = plot_scaling(results)
+```
+
+You can also use `judge` for the results
+
+```julia
+# Compare 2 and 4 threads 
+j = judge(results[3], results[2])
+show(j.benchmarkgroup)
+```
+
+It is also possible to do the benchmark on a specific branch. This is done by givin `bench_scaling` an extra parameter for branch
+
+```julia
+# same as above but for "my-branch" branch
+results = bench_scaling([1,2,4,8]; branch="my-branch") 
+```
