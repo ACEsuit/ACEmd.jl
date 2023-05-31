@@ -9,7 +9,7 @@ using Unitful
 
 ##
 
-function bench_scaling(n_threads; branch="")
+function bench_scaling(n_threads; branch=nothing)
     scaling = map(n_threads) do n
         @info "Benchmark $(n) threads"
         conf = BenchmarkConfig(id=branch, env = Dict("JULIA_NUM_THREADS" => n))
