@@ -92,7 +92,7 @@ In `scripts/` folder has a script file that can be used to benchmark scaling. To
 
 ```julia
 using ACEmd
-include(joinpath(ACEmd), "scripts", "benchmark.jl")
+include( joinpath(pkgdir(ACEmd), "scripts", "benchmark.jl") )
 
 # For 1, 2, 4 and 8 threads
 results = bench_scaling([1,2,4,8]) 
@@ -112,6 +112,6 @@ show(j.benchmarkgroup)
 It is also possible to do the benchmark on a specific branch. This is done by givin `bench_scaling` an extra parameter for branch
 
 ```julia
-# same as above but for a specific branch
+# same as above but for "my-branch" branch
 results = bench_scaling([1,2,4,8]; branch="my-branch") 
 ```
