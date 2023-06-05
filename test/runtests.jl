@@ -11,7 +11,7 @@ fname_ace = joinpath(pkgdir(ACEmd), "data", "TiAl.json")
 fname_xyz = joinpath(pkgdir(ACEmd), "data", "TiAl-big.xyz")
 
 const u_energy = u"hartree"
-const u_lenght = u"Å"
+const u_length = u"Å"
 
 
 @testset "JuLIP comparison" begin
@@ -20,8 +20,8 @@ const u_lenght = u"Å"
     data = read_extxyz(fname_xyz)[end]
 
     @test ace_energy(pot, data) ≈ ACE1.energy(pot_old, data) * u_energy
-    @test all( ace_forces(pot, data) .≈ ACE1.forces(pot_old, data) * (u_energy / u_lenght) )
-    @test ace_virial(pot, data) ≈ ACE1.virial(pot_old, data) * (u_energy * u_lenght)
+    @test all( ace_forces(pot, data) .≈ ACE1.forces(pot_old, data) * (u_energy / u_length) )
+    @test ace_virial(pot, data) ≈ ACE1.virial(pot_old, data) * (u_energy * u_length)
 end
 
 
@@ -34,6 +34,20 @@ end
     @test all( ace_forces(pot, julip_data) .≈ ace_forces(pot, ab_data) )
     @test ace_virial(pot, julip_data) ≈ ace_virial(pot, ab_data)
 end
+
+@testset "Units" begin
+    pot = load_ace_model(fname_ace; energy_unit=u"eV", length_unit=u"pm")
+    data = FastSystem(ExtXYZ.Atoms(read_frame(fname_xyz)))
+
+    @test unit( ace_energy(pot, data) ) == u"eV"
+    @test unit( ace_forces(pot, data)[1][1] ) == u"eV" / u"pm"
+    @test unit( ace_virial(pot, data)[1,1] ) == u"eV" * u"pm"
+
+    @test unit( ace_energy(pot, data; energy_unit=u_energy) ) == u_energy
+    @test unit( ace_forces(pot, data;  energy_unit=u_energy, length_unit=u_length)[1][1]) == u_energy / u_length
+    @test unit( ace_virial(pot, data; energy_unit=u_energy, length_unit=u_length)[1,1] ) == u_energy * u_length
+ end
+
 
 @testset "Combination interface" begin
     pot = load_ace_model(fname_ace)

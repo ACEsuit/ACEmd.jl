@@ -1,10 +1,14 @@
 
-struct ACEpotential{TE,TL}
+const default_length = u"Å"
+const default_energy = u"hartree"
+
+struct ACEpotential{TE,TL,TC}
     potentials::Vector{AbstractCalculator}
     energy_unit::TE
     length_unit::TL
-    function ACEpotential(potentials; energy_unit=u"hartree", lenght_unit=u"Å")
-        new{typeof(energy_unit), typeof(lenght_unit)}(potentials, energy_unit, lenght_unit)
+    cutoff_unit::TC
+    function ACEpotential(potentials; energy_unit=default_energy, length_unit=default_length, cutoff_unit=default_length)
+        new{typeof(energy_unit), typeof(length_unit), typeof(cutoff_unit)}(potentials, energy_unit, length_unit, cutoff_unit)
     end
 end
 
