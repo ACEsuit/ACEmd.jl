@@ -8,6 +8,9 @@ struct ACEpotential{TE,TL,TC}
     length_unit::TL
     cutoff_unit::TC
     function ACEpotential(potentials; energy_unit=default_energy, length_unit=default_length, cutoff_unit=default_length)
+        @assert dimension(energy_unit) == dimension(u"J")
+        @assert dimension(length_unit) == dimension(u"m")
+        @assert dimension(cutoff_unit) == dimension(u"m")
         new{typeof(energy_unit), typeof(length_unit), typeof(cutoff_unit)}(potentials, energy_unit, length_unit, cutoff_unit)
     end
 end

@@ -10,8 +10,8 @@ using Test
 fname_ace = joinpath(pkgdir(ACEmd), "data", "TiAl.json")
 fname_xyz = joinpath(pkgdir(ACEmd), "data", "TiAl-big.xyz")
 
-const u_energy = u"hartree"
-const u_length = u"Å"
+const u_energy = ACEmd.default_energy
+const u_length = ACEmd.default_length
 
 
 @testset "JuLIP comparison" begin
@@ -46,6 +46,16 @@ end
     @test unit( ace_energy(pot, data; energy_unit=u_energy) ) == u_energy
     @test unit( ace_forces(pot, data;  energy_unit=u_energy, length_unit=u_length)[1][1]) == u_energy / u_length
     @test unit( ace_virial(pot, data; energy_unit=u_energy, length_unit=u_length)[1,1] ) == u_energy * u_length
+
+    @test unit( ACEmd.get_cutoff(pot; cutoff_unit=u"m") ) == u_length
+    @test unit( ACEmd.get_cutoff(pot[2]; cutoff_unit=u"pm") ) == u"pm"
+    
+    pot1 = load_ace_model(fname_ace; energy_unit=u"eV", length_unit=u"pm", cutoff_unit=u"pm")
+    @test unit( ACEmd.get_cutoff(pot1) ) == u"pm"
+
+    @test_throws AssertionError load_ace_model(fname_ace; energy_unit=u"s")
+    @test_throws AssertionError load_ace_model(fname_ace; length_unit=u"s")
+    @test_throws AssertionError load_ace_model(fname_ace; cutoff_unit=u"s")
  end
 
 
