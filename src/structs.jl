@@ -1,6 +1,18 @@
 
-struct ACEpotential
+const default_length = u"Å"
+const default_energy = u"hartree"
+
+struct ACEpotential{TE,TL,TC}
     potentials::Vector{AbstractCalculator}
+    energy_unit::TE
+    length_unit::TL
+    cutoff_unit::TC
+    function ACEpotential(potentials; energy_unit=default_energy, length_unit=default_length, cutoff_unit=length_unit)
+        @assert dimension(energy_unit) == dimension(u"J")
+        @assert dimension(length_unit) == dimension(u"m")
+        @assert dimension(cutoff_unit) == dimension(u"m")
+        new{typeof(energy_unit), typeof(length_unit), typeof(cutoff_unit)}(potentials, energy_unit, length_unit, cutoff_unit)
+    end
 end
 
 

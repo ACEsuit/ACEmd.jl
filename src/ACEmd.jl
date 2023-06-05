@@ -1,13 +1,16 @@
 module ACEmd
 
+using Reexport
+
 using ACE1
-using AtomsBase
+@reexport using AtomsBase
 using CellListMap
 using Folds
 using FLoops
 #using SparseArrays
 using StaticArrays
-using Unitful
+@reexport using Unitful
+@reexport using UnitfulAtomic
 
 
 # functions

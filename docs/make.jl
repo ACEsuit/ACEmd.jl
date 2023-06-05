@@ -1,5 +1,6 @@
 using ACEmd
 using Documenter
+using ExtXYZ
 
 DocMeta.setdocmeta!(ACEmd, :DocTestSetup, :(using ACEmd); recursive=true)
 
