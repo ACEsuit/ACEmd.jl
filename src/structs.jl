@@ -7,7 +7,7 @@ struct ACEpotential{TE,TL,TC}
     energy_unit::TE
     length_unit::TL
     cutoff_unit::TC
-    function ACEpotential(potentials; energy_unit=default_energy, length_unit=default_length, cutoff_unit=default_length)
+    function ACEpotential(potentials; energy_unit=default_energy, length_unit=default_length, cutoff_unit=length_unit)
         @assert dimension(energy_unit) == dimension(u"J")
         @assert dimension(length_unit) == dimension(u"m")
         @assert dimension(cutoff_unit) == dimension(u"m")
