@@ -1,33 +1,45 @@
 
-function ace_energy(calc, at; domain=1:length(at), executor=ThreadedEx())
+function ace_energy(calc, at; domain=1:length(at), executor=ThreadedEx(), energy_unit=u"hartree", kwargs...)
     nlist = neighborlist(at, cutoff(calc); storelist=false)
     Etot = Folds.sum( domain, executor ) do i
         _, R, Z = neigsz(nlist, at, i)
         ace_evaluate(calc, R, Z, _atomic_number(at,i))
     end
-    return Etot
+    return Etot * energy_unit
 end
 
-function ace_energy(V::OneBody, at::Atoms; domain=1:length(at), executor=nothing)
+function ace_energy(V::OneBody, at::Atoms; domain=1:length(at), energy_unit=u"hartree", kwargs...)
     E = sum( domain ) do i
         ACE1.evaluate(V, chemical_symbol(at.Z[i]) )
     end
-    return E
+    return E * energy_unit
 end
 
-function ace_energy(V::OneBody, as::AbstractSystem; domain=1:length(as), executor=nothing)
+function ace_energy(V::OneBody, as::AbstractSystem; domain=1:length(as), energy_unit=u"hartree", kwargs...)
     E = sum( domain ) do i
         ACE1.evaluate(V, atomic_symbol(as, i) )
     end
-    return E
+    return E * energy_unit
 end
 
 # Generate interface for multiple potentials
 for ace_method in [ :ace_energy, :ace_forces, :ace_virial ]
     @eval begin
-        function $ace_method(calc::Union{AbstractArray, ACEpotential}, at; domain=1:length(at), executor=ThreadedEx())
+        function $ace_method(calc::AbstractArray, at; domain=1:length(at), executor=ThreadedEx(), energy_unit=u"hartree", length_unit=u"Å")
             tmp = asyncmap( calc ) do V
-                $ace_method(V, at; domain=domain, executor=executor)
+                $ace_method(V, at; domain=domain, executor=executor, energy_unit=energy_unit, length_unit=length_unit)
+            end
+            return sum(tmp)
+        end
+    end
+end
+
+# Generate interface for multiple potentials
+for ace_method in [ :ace_energy, :ace_forces, :ace_virial ]
+    @eval begin
+        function $ace_method(calc::ACEpotential, at; domain=1:length(at), executor=ThreadedEx(), energy_unit=calc.energy_unit, length_unit=calc.length_unit)
+            tmp = asyncmap( calc ) do V
+                $ace_method(V, at; domain=domain, executor=executor, energy_unit=energy_unit, length_unit=length_unit)
             end
             return sum(tmp)
         end
@@ -39,7 +51,7 @@ end
 
 ## forces
 
-function ace_forces(V, at; domain=1:length(at), executor=ThreadedEx())
+function ace_forces(V, at; domain=1:length(at), executor=ThreadedEx(), energy_unit=u"hartree", length_unit=u"Å")
     nlist = neighborlist(at, cutoff(V))
     F = Folds.sum( domain, executor ) do i
         j, R, Z = neigsz(nlist, at, i)
@@ -53,26 +65,26 @@ function ace_forces(V, at; domain=1:length(at), executor=ThreadedEx())
         end
         f
     end
-    return F
+    return F * (energy_unit / length_unit)
 end
 
 
-function ace_forces(::OneBody, at::Atoms; kwargs...)
+function ace_forces(::OneBody, at::Atoms; energy_unit=u"hartree", length_unit=u"Å", kwargs...)
     T = (eltype ∘ eltype)(at.X)
     F = [ SVector{3}( zeros(T, 3) ) for i in 1:length(at) ]
-    return F
+    return F * (energy_unit / length_unit)
 end
 
-function ace_forces(::OneBody, as::AbstractSystem; kwargs...)
+function ace_forces(::OneBody, as::AbstractSystem; energy_unit=u"hartree", length_unit=u"Å", kwargs...)
     T = eltype( ustrip.( position(as, 1) )  )
     F = [ SVector{3}( zeros(T, 3) ) for _ in 1:length(as) ]
-    return F
+    return F * (energy_unit / length_unit)
 end
 
 
 ## virial
 
-function ace_virial(V, at; domain=1:length(at), executor=ThreadedEx())
+function ace_virial(V, at; domain=1:length(at), executor=ThreadedEx(), energy_unit=u"hartree", length_unit=u"Å")
     nlist = neighborlist(at, cutoff(V))
     vir = Folds.sum( domain, executor ) do i
         j, R, Z = neigsz(nlist, at, i)
@@ -82,17 +94,17 @@ function ace_virial(V, at; domain=1:length(at), executor=ThreadedEx())
         end
         site_virial
     end
-    return vir
+    return vir * (energy_unit * length_unit)
 end
 
-function ace_virial(::OneBody, at::Atoms; kwargs...)
+function ace_virial(::OneBody, at::Atoms; energy_unit=u"hartree", length_unit=u"Å", kwargs...)
     T = (eltype ∘ eltype)(at.X)
-    return SMatrix{3,3}(zeros(T, 3,3))
+    return SMatrix{3,3}(zeros(T, 3,3)) * (energy_unit * length_unit)
 end
 
-function ace_virial(::OneBody, as::AbstractSystem; kwargs...)
+function ace_virial(::OneBody, as::AbstractSystem; energy_unit=u"hartree", length_unit=u"Å", kwargs...)
     T = eltype( ustrip.( position( as[begin] ) )  )
-    return SMatrix{3,3}(zeros(T, 3,3))
+    return SMatrix{3,3}(zeros(T, 3,3)) * (energy_unit * length_unit)
 end
 
 

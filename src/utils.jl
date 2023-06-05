@@ -18,7 +18,7 @@ function neigsz(nlist::PairList, at, i::Integer)
 end
 
 
-function load_ace_model(fname; old_format=false)
+function load_ace_model(fname; old_format=false, energy_unit=u"hartree", lenght_unit=u"Å")
     pot_tmp = load_dict(fname)
     if haskey(pot_tmp, "IP")
         pot = read_dict(pot_tmp["IP"])

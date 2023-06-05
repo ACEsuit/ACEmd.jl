@@ -8,6 +8,7 @@ using FLoops
 #using SparseArrays
 using StaticArrays
 using Unitful
+using UnitfulAtomic
 
 
 # functions

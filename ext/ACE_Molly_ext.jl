@@ -16,7 +16,7 @@ function Molly.forces(
         n_threads=nothing,
         executor=ThreadedEx()
     )
-    return ace_forces(acp, sys; executor=executor) *u"hartree/Å"
+    return ace_forces(acp, sys; executor=executor) 
 end
 
 
@@ -27,7 +27,7 @@ function Molly.potential_energy(
         n_threads=nothing,
         executor=ThreadedEx()
     )
-    return ace_energy(acp, sys; executor=executor) * u"hartree"
+    return ace_energy(acp, sys; executor=executor) 
 end
  
 

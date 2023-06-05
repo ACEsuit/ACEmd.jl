@@ -1,6 +1,11 @@
 
-struct ACEpotential
+struct ACEpotential{TE,TL}
     potentials::Vector{AbstractCalculator}
+    energy_unit::TE
+    length_unit::TL
+    function ACEpotential(potentials; energy_unit=u"hartree", lenght_unit=u"Å")
+        new{typeof(energy_unit), typeof(lenght_unit)}(potentials, energy_unit, lenght_unit)
+    end
 end
 
 
