@@ -18,7 +18,12 @@ function neigsz(nlist::PairList, at, i::Integer)
 end
 
 
-function load_ace_model(fname; old_format=false, energy_unit=u"hartree", length_unit=u"Å")
+function load_ace_model(fname;
+        old_format=false,
+        energy_unit=default_energy,
+        length_unit=default_length,
+        cutoff_unit=default_length
+    )
     pot_tmp = load_dict(fname)
     if haskey(pot_tmp, "IP")
         pot = read_dict(pot_tmp["IP"])
@@ -30,30 +35,48 @@ function load_ace_model(fname; old_format=false, energy_unit=u"hartree", length_
     if old_format
         return pot
     else
-        return ACEpotential(pot.components; energy_unit=energy_unit, length_unit=length_unit)
+        return ACEpotential(pot.components; energy_unit=energy_unit, length_unit=length_unit, cutoff_unit=cutoff_unit)
     end
 end
 
 
-function neighborlist(ab, cutoff; kwargs...)
-    cell = ustrip.( u"Å", hcat( bounding_box(ab)... ) )
+function neighborlist(ab, cutoff; length_unit=default_length, kwargs...)
+    cell = ustrip.(length_unit, hcat( bounding_box(ab)... ) )
     pbc = map( boundary_conditions(ab) ) do x
         x == Periodic()
     end
     r = map( 1:length(ab)) do i
         # Need to have SVector here for PairList to work
         # if position does not give SVector
-        SVector( ustrip.(u"Å", position(ab,i))...)
+        SVector( ustrip.(length_unit, position(ab,i))...)
     end
-    nlist = PairList(r, cutoff, cell, pbc; int_type=Int)
+    nlist = PairList(r, ustrip(length_unit, cutoff), cell, pbc; int_type=Int)
     return nlist
+end
+
+
+function get_cutoff(V; cutoff_unit=default_length)
+    return cutoff(V) * cutoff_unit
+end
+
+function get_cutoff(V::ACEpotential; kwargs...)
+    c = map( V ) do v
+        if typeof(v) <: OneBody
+            return 0
+        else
+            return cutoff(v)
+        end
+    end
+    return maximum( c )  * V.cutoff_unit
 end
 
 
 
  ## CellListMap
 
-neighborlist(at::Atoms, cutoff; kwargs...) = ACE1.neighbourlist(at, cutoff; kwargs...)
+function neighborlist(at::Atoms, cutoff; kwargs...)
+    return ACE1.neighbourlist(at, ustrip(u"Å", cutoff); kwargs...)
+end
 
 
 function neighborlist_clm(ab::AbstractSystem, cutoff; kwargs...)

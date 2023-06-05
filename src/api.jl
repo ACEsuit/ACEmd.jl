@@ -1,6 +1,6 @@
 
 function ace_energy(calc, at; domain=1:length(at), executor=ThreadedEx(), energy_unit=default_energy, kwargs...)
-    nlist = neighborlist(at, cutoff(calc); storelist=false)
+    nlist = neighborlist(at, get_cutoff(calc); storelist=false)
     Etot = Folds.sum( domain, executor ) do i
         _, R, Z = neigsz(nlist, at, i)
         ace_evaluate(calc, R, Z, _atomic_number(at,i))
@@ -30,7 +30,8 @@ for ace_method in [ :ace_energy, :ace_forces, :ace_virial ]
                 executor=ThreadedEx(),
                 energy_unit=default_energy,
                 length_unit=default_length,
-                cutoff_unit=default_length
+                cutoff_unit=default_length,
+                kwargs...
             )
             tmp = asyncmap( calc ) do V
                 $ace_method(V, at;
@@ -38,7 +39,8 @@ for ace_method in [ :ace_energy, :ace_forces, :ace_virial ]
                     executor=executor,
                     energy_unit=energy_unit,
                     length_unit=length_unit,
-                    cutoff_unit=cutoff_unit
+                    cutoff_unit=cutoff_unit,
+                    kwargs...
                 )
             end
             return sum(tmp)
@@ -54,7 +56,8 @@ for ace_method in [ :ace_energy, :ace_forces, :ace_virial ]
                 executor=ThreadedEx(),
                 energy_unit=calc.energy_unit,
                 length_unit=calc.length_unit,
-                cutoff_unit=default_length
+                cutoff_unit=calc.cutoff_unit,
+                kwargs...
             )
             tmp = asyncmap( calc ) do V
                 $ace_method(V, at;
@@ -62,7 +65,8 @@ for ace_method in [ :ace_energy, :ace_forces, :ace_virial ]
                     executor=executor,
                     energy_unit=energy_unit,
                     length_unit=length_unit,
-                    cutoff_unit=cutoff_unit
+                    cutoff_unit=cutoff_unit,
+                    kwargs...
                 )
             end
             return sum(tmp)
@@ -75,8 +79,15 @@ end
 
 ## forces
 
-function ace_forces(V, at; domain=1:length(at), executor=ThreadedEx(), energy_unit=default_energy, length_unit=default_length)
-    nlist = neighborlist(at, cutoff(V))
+function ace_forces(V, at;
+        domain=1:length(at),
+        executor=ThreadedEx(),
+        energy_unit=default_energy,
+        length_unit=default_length,
+        cutoff_unit=default_length,
+        kwargs...
+    )
+    nlist = neighborlist(at, get_cutoff(V; cutoff_unit=cutoff_unit) )
     F = Folds.sum( domain, executor ) do i
         j, R, Z = neigsz(nlist, at, i)
         _, tmp = ace_evaluate_d(V, R, Z, _atomic_number(at,i))
@@ -95,21 +106,28 @@ end
 
 function ace_forces(::OneBody, at::Atoms; energy_unit=default_energy, length_unit=default_length, kwargs...)
     T = (eltype ∘ eltype)(at.X)
-    F = [ SVector{3}( zeros(T, 3) ) for i in 1:length(at) ]
-    return F * (energy_unit / length_unit)
+    F = [ SVector{3}( zeros(T, 3) ) * (energy_unit / length_unit) for _ in 1:length(at) ]
+    return F
 end
 
 function ace_forces(::OneBody, as::AbstractSystem; energy_unit=default_energy, length_unit=default_length, kwargs...)
     T = eltype( ustrip.( position(as, 1) )  )
-    F = [ SVector{3}( zeros(T, 3) ) for _ in 1:length(as) ]
-    return F * (energy_unit / length_unit)
+    F = [ SVector{3}( zeros(T, 3) ) * (energy_unit / length_unit) for _ in 1:length(as) ]
+    return F
 end
 
 
 ## virial
 
-function ace_virial(V, at; domain=1:length(at), executor=ThreadedEx(), energy_unit=default_energy, length_unit=default_length)
-    nlist = neighborlist(at, cutoff(V))
+function ace_virial(V, at;
+        domain=1:length(at),
+        executor=ThreadedEx(),
+        energy_unit=default_energy,
+        length_unit=default_length,
+        cutoff_unit=default_length,
+        kwargs...
+    )
+    nlist = neighborlist(at, get_cutoff(V; cutoff_unit=cutoff_unit) )
     vir = Folds.sum( domain, executor ) do i
         j, R, Z = neigsz(nlist, at, i)
         _, tmp = ace_evaluate_d(V, R, Z, _atomic_number(at,i))
@@ -135,22 +153,22 @@ end
 ## Combinations
 # these will be optimized later
 
-function ace_energy_forces(pot, data; domain=1:length(data), executor=ThreadedEx())
-    E = ace_energy(pot, data; domain=domain, executor=executor)
-    F = ace_forces(pot, data; domain=domain, executor=executor)
+function ace_energy_forces(pot, data; kwargs...)
+    E = ace_energy(pot, data; kwargs...)
+    F = ace_forces(pot, data; kwargs...)
     return Dict("energy"=>E, "forces"=>F)
 end
 
 
-function ace_energy_forces_virial(pot, data; domain=1:length(data), executor=ThreadedEx())
-    E = ace_energy(pot, data; domain=domain, executor=executor)
-    F = ace_forces(pot, data; domain=domain, executor=executor)
-    V = ace_virial(pot, data; domain=domain, executor=executor)
+function ace_energy_forces_virial(pot, data; kwargs...)
+    E = ace_energy(pot, data; kwargs...)
+    F = ace_forces(pot, data; kwargs...)
+    V = ace_virial(pot, data; kwargs...)
     return Dict("energy"=>E, "forces"=>F, "virial"=>V)
 end
 
-function ace_forces_virial(pot, data; domain=1:length(data), executor=ThreadedEx())
-    F = ace_forces(pot, data; domain=domain, executor=executor)
-    V = ace_virial(pot, data; domain=domain, executor=executor)
+function ace_forces_virial(pot, data; kwargs...)
+    F = ace_forces(pot, data; kwargs...)
+    V = ace_virial(pot, data; kwargs...)
     return Dict("forces"=>F, "virial"=>V)
 end
