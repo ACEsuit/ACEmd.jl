@@ -53,7 +53,7 @@ ace_energy(pot_ev, data)
 Alternatively you can overload the default unit by giving it explicitely
 
 ```@repl 1
-ace_energy(pot_ev, data; energy_unit="hartree")
+ace_energy(pot_ev, data; energy_unit=u"hartree")
 ```
 
 Following units are taken into account
