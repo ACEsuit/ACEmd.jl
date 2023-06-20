@@ -10,7 +10,7 @@ ACEmd is fully [AtomsBase](https://github.com/JuliaMolSim/AtomsBase.jl) compatab
 
 ## Example use case
 
-```@example
+```@example 1
 using ACEmd # Reexports AtomsBase and Unitful
 using ExtXYZ
 
@@ -33,14 +33,14 @@ ACEmd supports [Unitful](https://github.com/PainterQubits/Unitful.jl) and it is 
 
 Defaults units are
 
-```@repl
+```@repl 1
 ACEmd.default_energy
 ACEmd.default_length
 ```
 
 Units can be changes when loading potential
 
-```@example
+```@example 1
 pot_ev = load_ace_model(fname_ace;
     energy_unit=u"eV",
     length_unit=u"Å",
@@ -52,15 +52,15 @@ ace_energy(pot_ev, data)
 
 Alternatively you can overload the default unit by giving it explicitely
 
-```@repl
+```@repl 1
 ace_energy(pot_ev, data; energy_unit="hartree")
 ```
 
 Following units are taken into account
 
 - `energy_unit` defines the energy unit of the potential
-- `length_unit` defines the length unit the potential is defined
-- `cutoff_unit` defines unit for the cutoff the potential is using
+- `length_unit` defines the length unit for the potential
+- `cutoff_unit` defines unit for the cutoff that the potential is using
 
 
 ```@index
