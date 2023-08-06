@@ -17,8 +17,26 @@ function neigsz(nlist::PairList, at, i::Integer)
     return j, R, Z 
 end
 
+"""
+    load_ace_model(fname::AbstractString; Kwargs)
+    load_ace_model(potential: Kwargs)
 
-function load_ace_model(fname;
+Used to load potential from `json` or `yml` files.
+By default this adds units for the potential. You can use
+Kwargs to control what units are used. The default units
+are defined in `ACEmd.default_energy` and `ACEmd.default_length`.
+
+You can also use this to convert non unit holding potentials to
+potentials that have units. Like e.g. when you have fitted a new
+potential it does not have unit. You can then use this function to
+wrap units for it.
+
+# Kwargs
+- `energy_unit=default_energy`  :  energy unit for the potential
+- `length_unit=default_length`  :  lenght unit used for the force and atomic system
+- `cutoff_unit=default_length`  :  unit in which cuttoff radius has been defined
+"""
+function load_ace_model(fname::AbstractString;
         old_format=false,
         energy_unit=default_energy,
         length_unit=default_length,
@@ -37,6 +55,15 @@ function load_ace_model(fname;
     else
         return ACEpotential(pot.components; energy_unit=energy_unit, length_unit=length_unit, cutoff_unit=cutoff_unit)
     end
+end
+
+
+function load_ace_model(pot;
+        energy_unit=default_energy,
+        length_unit=default_length,
+        cutoff_unit=default_length
+    )
+    return ACEpotential(pot.components; energy_unit=energy_unit, length_unit=length_unit, cutoff_unit=cutoff_unit)
 end
 
 

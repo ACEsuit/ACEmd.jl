@@ -15,8 +15,8 @@ const u_length = ACEmd.default_length
 
 
 @testset "JuLIP comparison" begin
-    pot = load_ace_model(fname_ace)
     pot_old = load_ace_model(fname_ace; old_format=true)
+    pot = load_ace_model(pot_old)
     data = read_extxyz(fname_xyz)[end]
 
     @test ace_energy(pot, data) ≈ ACE1.energy(pot_old, data) * u_energy

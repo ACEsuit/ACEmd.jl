@@ -3,9 +3,11 @@ module ACEmd
 using Reexport
 
 using ACE1
+using ACEbase
 @reexport using AtomsBase
 using CellListMap
 using Folds
+@reexport using Folds: ThreadedEx, SequentialEx, DistributedEx
 using FLoops
 #using SparseArrays
 using StaticArrays
