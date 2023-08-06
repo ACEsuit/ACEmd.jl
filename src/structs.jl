@@ -1,6 +1,6 @@
 
 const default_length = u"Å"
-const default_energy = u"hartree"
+const default_energy = u"eV"
 
 struct ACEpotential{TE,TL,TC}
     potentials::Vector{AbstractCalculator}
@@ -29,5 +29,5 @@ Base.length(acep::ACEpotential) = length(acep.potentials)
 Base.getindex(acep::ACEpotential, i) = acep.potentials[i]
 
 function Base.show(io::IO, ::MIME"text/plain", acep::ACEpotential)
-    print(io, "ACE potential with ", length(acep), " subpotentials")
+    print(io, "ACE potential consisting of ", length(acep), " subpotentials")
 end

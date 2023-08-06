@@ -1,4 +1,20 @@
+"""
+    ace_energy(potential, atoms, Kwargs)
 
+Calculates ACE potential energy for atomic system.
+The `atoms` object needs to be in `AtomsBase` compatable format.
+The returned energy has a unit as defined by `Unitful`.
+
+Parallel execution is done with Transducers.jl and there is an option to
+use different executors. Look for `ThreadedEx` for more details on how to control it. 
+
+# Kwargs
+- `domain=1:length(atoms)`  :  choose subset of atoms to which energy is calculated
+- `executor=ThreadedEx()`   :  used to control multithreading using Transducers.jl
+- `energy_unit`  :   used to override energy unit for the calculation
+- `length_unit`  :   used to override lenght unit for the calculation
+- `cutoff_unit`  :   used to override unit that cutoff radius is defined
+"""
 function ace_energy(calc, at; domain=1:length(at), executor=ThreadedEx(), energy_unit=default_energy, kwargs...)
     nlist = neighborlist(at, get_cutoff(calc); storelist=false)
     Etot = Folds.sum( domain, executor ) do i
@@ -79,6 +95,23 @@ end
 
 ## forces
 
+"""
+    ace_forces(potential, atoms, Kwargs)
+
+Calculates forces for ACE potential for given atomic system.
+The `atoms` object needs to be in `AtomsBase` compatable format.
+The returned energy has a unit as defined by `Unitful`.
+
+Parallel execution is done with Transducers.jl and there is an option to
+use different executors. Look for `ThreadedEx` for more details on how to control it. 
+
+# Kwargs
+- `domain=1:length(atoms)`  :  choose subset of atoms to which energy is calculated
+- `executor=ThreadedEx()`   :  used to control multithreading using Transducers.jl
+- `energy_unit`  :   used to override energy unit for the calculation
+- `length_unit`  :   used to override lenght unit for the calculation
+- `cutoff_unit`  :   used to override unit that cutoff radius is defined
+"""
 function ace_forces(V, at;
         domain=1:length(at),
         executor=ThreadedEx(),
@@ -119,6 +152,23 @@ end
 
 ## virial
 
+"""
+    ace_virial(potential, atoms, Kwargs)
+
+Calculates virial for ACE potential for given atomic system.
+The `atoms` object needs to be in `AtomsBase` compatable format.
+The returned energy has a unit as defined by `Unitful`.
+
+Parallel execution is done with Transducers.jl and there is an option to
+use different executors. Look for `ThreadedEx` for more details on how to control it. 
+
+# Kwargs
+- `domain=1:length(atoms)`  :  choose subset of atoms to which energy is calculated
+- `executor=ThreadedEx()`   :  used to control multithreading using Transducers.jl
+- `energy_unit`  :   used to override energy unit for the calculation
+- `length_unit`  :   used to override lenght unit for the calculation
+- `cutoff_unit`  :   used to override unit that cutoff radius is defined
+"""
 function ace_virial(V, at;
         domain=1:length(at),
         executor=ThreadedEx(),
