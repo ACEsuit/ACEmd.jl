@@ -34,13 +34,17 @@ function ACEmd._atomic_number(sys::Molly.System, i)
 end
 
 function Molly.System(
-    sys::AbstractSystem,
-    pot::ACEpotential;
-    energy_units = pot.energy_unit,
-    force_units = pot.energy_unit/pot.length_unit,
-    velocity_units = pot.length_unit/u"fs",
-    kwargs...
+        sys::AbstractSystem,
+        pot::ACEpotential;
+        energy_units = pot.energy_unit,
+        force_units = pot.energy_unit/pot.length_unit,
+        velocity_units = pot.length_unit/u"fs",
+        kwargs...
     )
+    @assert dimension(energy_units) == dimension(u"J") "energy unit has wrong dimenstions"
+    @assert dimension(force_units) == dimension(u"kg*m/s^2")  "force unit has wrong dimenstions"
+    @assert dimension(velocity_units) == dimension(u"m/s")  "velocity unit has wrong dimenstions"
+
     atoms = [Molly.Atom( index=i, mass=atomic_mass(sys, i) ) for i in 1:length(sys) ]
 
     boundary = begin
