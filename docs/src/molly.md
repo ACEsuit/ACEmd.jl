@@ -18,7 +18,7 @@ using ExtXYZ
 using Unitful
 
 
-# Load ACE data and initial structure
+# Load ACE model and initial structure
 fname_ace = joinpath(pkgdir(ACEmd), "data", "TiAl.json")
 fname_xyz = joinpath(pkgdir(ACEmd), "data", "TiAl-big.xyz")
 
@@ -26,14 +26,14 @@ data = ExtXYZ.Atoms(read_frame(fname_xyz))
 pot = load_ace_model(fname_ace)
 
 # Pack data to Molly compatible format
-# data is AtomsBase system type
+# data is AtomsBase compatible structure
 sys = Molly.System(data, pot)
 
 # Set up temperature and velocities
 temp = 298.0u"K"
-vel = random_velocities(sys, tmp)
+vel = random_velocities(sys, temp)
 
-# Add velocities and loggers
+# Add initial velocities and loggers
 sys = Molly.System(
     sys;
     velocities = vel,

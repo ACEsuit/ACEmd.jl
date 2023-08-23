@@ -90,4 +90,10 @@ end
     
     @test ace_energy(pot, data)  ≈ Molly.potential_energy(sys)
     @test all( ace_forces(pot, data) .≈ Molly.forces(sys) )
+
+    simulator = VelocityVerlet(
+        dt=1.0u"fs",
+        coupling=AndersenThermostat(300u"K", 1.0u"ps"),
+    )
+    simulate!(sys, simulator, 10)
 end 
