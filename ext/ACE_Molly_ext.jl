@@ -36,6 +36,9 @@ end
 function Molly.System(
     sys::AbstractSystem,
     pot::ACEpotential;
+    energy_units = pot.energy_unit,
+    force_units = pot.energy_unit/pot.length_unit,
+    velocity_units = pot.length_unit/u"fs",
     kwargs...
     )
     atoms = [Molly.Atom( index=i, mass=atomic_mass(sys, i) ) for i in 1:length(sys) ]
@@ -60,10 +63,11 @@ function Molly.System(
         end,
         general_inters = (pot,),
         boundary=boundary,
-        energy_units=pot.energy_unit,
-        force_units=pot.energy_unit/pot.length_unit,
+        energy_units=energy_units,
+        force_units=force_units,
         velocities = map(sys) do a
-            SVector(velocity(a)...)
+            tmp = SVector(velocity(a)...)
+            uconvert.(velocity_units, tmp)
         end,
         kwargs...
     )
