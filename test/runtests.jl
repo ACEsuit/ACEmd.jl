@@ -84,24 +84,10 @@ end
 
 @testset "Molly support" begin
     pot = load_ace_model(fname_ace)
-    data = FastSystem(ExtXYZ.Atoms(read_frame(fname_xyz)))
+    data = ExtXYZ.Atoms(read_frame(fname_xyz))
 
-    atoms = [Molly.Atom( index=i, mass=AtomsBase.atomic_mass(data,i) ) for i in 1:length(data) ]
-    boundary = begin
-        box = bounding_box(data)
-        CubicBoundary(box[1][1], box[2][2], box[3][3])
-    end
-    adata = [ (; :Z=>z,:element=>s)  for (z,s) in zip(AtomsBase.atomic_number(data), AtomsBase.atomic_symbol(data))  ]
-
-    sys = System(
-           atoms=atoms,
-           atoms_data = adata,
-           coords=position(data),
-           general_inters = (pot,),
-           boundary=boundary,
-           energy_units=u"eV",
-           force_units=u"eV/Å",
-       )
+    sys = Molly.System(data, pot)
+    
     @test ace_energy(pot, data)  ≈ Molly.potential_energy(sys)
     @test all( ace_forces(pot, data) .≈ Molly.forces(sys) )
 end 
