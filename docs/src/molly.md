@@ -14,50 +14,37 @@ There are couple of notes that need to be understood.
 using Molly
 using ACEmd
 
-using AtomsBase
 using ExtXYZ
 using Unitful
 
 
-# Load ACE data and initial structure
+# Load ACE model and initial structure
 fname_ace = joinpath(pkgdir(ACEmd), "data", "TiAl.json")
 fname_xyz = joinpath(pkgdir(ACEmd), "data", "TiAl-big.xyz")
 
-data = FastSystem(ExtXYZ.Atoms(read_frame(fname_xyz)))
+data = ExtXYZ.Atoms(read_frame(fname_xyz))
 pot = load_ace_model(fname_ace)
 
-# Prepare data to Molly compatible format
-atoms = [Molly.Atom( index=i, mass=atomic_mass(data, i) ) for i in 1:length(data) ]
-
-boundary = begin
-    box = bounding_box(data)
-    CubicBoundary(box[1][1], box[2][2], box[3][3])
-end
-
-atom_data = [ (; :Z=>z,:element=>s)  for (z,s) in zip(atomic_number(data), atomic_symbol(data))  ]
+# Pack data to Molly compatible format
+# data is AtomsBase compatible structure
+sys = Molly.System(data, pot)
 
 # Set up temperature and velocities
 temp = 298.0u"K"
-velocities = [random_velocity(m, temp) for m in atomic_mass(data)]
+vel = random_velocities(sys, temp)
+
+# Add initial velocities and loggers
+sys = Molly.System(
+    sys;
+    velocities = vel,
+    loggers=(temp=TemperatureLogger(100),)
+)
 
 # Set up simulator
 simulator = VelocityVerlet(
     dt=1.0u"fs",
     coupling=AndersenThermostat(temp, 1.0u"ps"),
 )
-
-# Set up Molly system
-sys = System(
-           atoms=atoms,
-           atoms_data = atom_data,
-           coords=position(data),
-           velocities=velocities,
-           general_inters = (pot,),
-           boundary=boundary,
-           loggers=(temp=TemperatureLogger(100),),
-           energy_units=u"eV",
-           force_units=u"eV/Å",
-       )
 
 
 # Perform MD
