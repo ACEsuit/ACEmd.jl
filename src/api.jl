@@ -125,10 +125,11 @@ function ace_forces(V, at;
         j, R, Z = neigsz(nlist, at, i)
         _, tmp = ace_evaluate_d(V, R, Z, _atomic_number(at,i))
 
-        # Make a copy with -1 .* tmp.dV
-        sout = sparsevec( [j[k] for k in eachindex(j)], -1 .* tmp.dV, length(at) )
-        sout[i] += sum(tmp.dV)
-        sout
+        # Force a copy with -1 .* tmp.dV
+        # tmp.dV cannot be used in reduction by itself
+        sv = sparsevec( [j[k] for k in eachindex(j)], -1 .* tmp.dV, length(at) )
+        sv[i] += sum(tmp.dV)
+        sv
     end
     return F * (energy_unit / length_unit)
 end
