@@ -6,11 +6,12 @@ import ACE1
 using ACEbase
 @reexport using AtomsBase
 using CellListMap
+using ChunkSplitters
 using Folds
 @reexport using Folds: ThreadedEx, SequentialEx, DistributedEx
 using FLoops
 using NeighbourLists
-#using SparseArrays
+using SparseArrays
 using StaticArrays
 @reexport using Unitful
 @reexport using UnitfulAtomic

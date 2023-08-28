@@ -1,15 +1,15 @@
 """
-    ace_energy(potential, ACE1.Atoms, Kwargs)
+    ace_energy(potential, atoms, Kwargs)
 
 Calculates ACE potential energy for atomic system.
-The `ACE1.Atoms` object needs to be in `ACE1.AtomsBase` compatable format.
+The `atoms` object needs to be in `AtomsBase` compatable format.
 The returned energy has a unit as defined by `Unitful`.
 
 Parallel execution is done with Transducers.jl and there is an option to
 use different executors. Look for `ThreadedEx` for more details on how to control it. 
 
 # Kwargs
-- `domain=1:length(ACE1.Atoms)`  :  choose subset of ACE1.Atoms to which energy is calculated
+- `domain=1:length(atoms)`  :  choose subset of atoms to which energy is calculated
 - `executor=ThreadedEx()`   :  used to control multithreading using Transducers.jl
 - `energy_unit`  :   used to override energy unit for the calculation
 - `length_unit`  :   used to override lenght unit for the calculation
@@ -44,22 +44,24 @@ for ace_method in [ :ace_energy, :ace_forces, :ace_virial ]
         function $ace_method(calc::AbstractArray, at;
                 domain=1:length(at),
                 executor=ThreadedEx(),
+                ntasks=Threads.nthreads(),
                 energy_unit=default_energy,
                 length_unit=default_length,
                 cutoff_unit=default_length,
                 kwargs...
             )
-            tmp = asyncmap( calc ) do V
-                $ace_method(V, at;
+            tmp = map( calc ) do V
+                Threads.@spawn $ace_method(V, at;
                     domain=domain,
                     executor=executor,
+                    ntasks=ntasks,
                     energy_unit=energy_unit,
                     length_unit=length_unit,
                     cutoff_unit=cutoff_unit,
                     kwargs...
                 )
             end
-            return sum(tmp)
+            return sum(fetch, tmp)
         end
     end
 end
@@ -70,22 +72,24 @@ for ace_method in [ :ace_energy, :ace_forces, :ace_virial ]
         function $ace_method(calc::ACEpotential, at;
                 domain=1:length(at),
                 executor=ThreadedEx(),
+                ntasks=Threads.nthreads(),
                 energy_unit=calc.energy_unit,
                 length_unit=calc.length_unit,
                 cutoff_unit=calc.cutoff_unit,
                 kwargs...
-            )
+        )
             tmp = asyncmap( calc ) do V
                 $ace_method(V, at;
                     domain=domain,
                     executor=executor,
+                    ntasks=ntasks,
                     energy_unit=energy_unit,
                     length_unit=length_unit,
                     cutoff_unit=cutoff_unit,
                     kwargs...
                 )
             end
-            return sum(tmp)
+            return sum( tmp )
         end
     end
 end
@@ -96,44 +100,58 @@ end
 ## forces
 
 """
-    ace_forces(potential, ACE1.Atoms, Kwargs)
+    ace_forces(potential, atoms, Kwargs)
 
 Calculates forces for ACE potential for given atomic system.
-The `ACE1.Atoms` object needs to be in `ACE1.AtomsBase` compatable format.
+The `atoms` object needs to be in `AtomsBase` compatable format.
 The returned energy has a unit as defined by `Unitful`.
 
 Parallel execution is done with Transducers.jl and there is an option to
 use different executors. Look for `ThreadedEx` for more details on how to control it. 
 
 # Kwargs
-- `domain=1:length(ACE1.Atoms)`  :  choose subset of ACE1.Atoms to which energy is calculated
-- `executor=ThreadedEx()`   :  used to control multithreading using Transducers.jl
+- `domain=1:length(atoms)`          :  choose subset of atoms to which energy is calculated
+- `executor=ThreadedEx()`           :  used to control multithreading using Transducers.jl
+- `ntasks=Threads.nthreads()`       :  how many tasks are used in the calculation
 - `energy_unit`  :   used to override energy unit for the calculation
 - `length_unit`  :   used to override lenght unit for the calculation
 - `cutoff_unit`  :   used to override unit that cutoff radius is defined
 """
-function ace_forces(V, at;
-        domain=1:length(at),
-        executor=ThreadedEx(),
-        energy_unit=default_energy,
-        length_unit=default_length,
-        cutoff_unit=default_length,
-        kwargs...
-    )
+function ace_forces(
+    V,
+    at;
+    domain=1:length(at),
+    executor=ThreadedEx(),
+    ntasks=Threads.nthreads(),
+    energy_unit=default_energy,
+    length_unit=default_length,
+    cutoff_unit=default_length,
+    kwargs...
+)   
     nlist = neighborlist(at, get_cutoff(V; cutoff_unit=cutoff_unit) )
-    F = Folds.sum( domain, executor ) do i
+    F = Folds.sum( collect(chunks(domain, ntasks)), executor ) do (d, _)
+        ace_forces(V, at, nlist; domain=d)
+    end
+    return F * (energy_unit / length_unit)
+end
+
+
+function ace_forces(
+    V, at, nlist;
+    domain=1:length(at),
+    kwargs...
+)   
+    f = zeros(SVector{3, Float64}, length(at))
+    for i in domain
         j, R, Z = neigsz(nlist, at, i)
         _, tmp = ace_evaluate_d(V, R, Z, _atomic_number(at,i))
 
-        #TODO make this faster
-        f = zeros(eltype(tmp.dV), length(at))
         for k in eachindex(j)
             f[j[k]] -= tmp.dV[k]
-            f[i]    += tmp.dV[k]
         end
-        f
+        f[i] += sum(tmp.dV)
     end
-    return F * (energy_unit / length_unit)
+    return f
 end
 
 
@@ -153,17 +171,17 @@ end
 ## virial
 
 """
-    ace_virial(potential, ACE1.Atoms, Kwargs)
+    ace_virial(potential, atoms, Kwargs)
 
 Calculates virial for ACE potential for given atomic system.
-The `ACE1.Atoms` object needs to be in `ACE1.AtomsBase` compatable format.
+The `atoms` object needs to be in `AtomsBase` compatable format.
 The returned energy has a unit as defined by `Unitful`.
 
 Parallel execution is done with Transducers.jl and there is an option to
 use different executors. Look for `ThreadedEx` for more details on how to control it. 
 
 # Kwargs
-- `domain=1:length(ACE1.Atoms)`  :  choose subset of ACE1.Atoms to which energy is calculated
+- `domain=1:length(atoms)`  :  choose subset of atoms to which energy is calculated
 - `executor=ThreadedEx()`   :  used to control multithreading using Transducers.jl
 - `energy_unit`  :   used to override energy unit for the calculation
 - `length_unit`  :   used to override lenght unit for the calculation

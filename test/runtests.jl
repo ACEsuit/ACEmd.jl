@@ -33,6 +33,8 @@ end
     @test ace_energy(pot, julip_data) ≈ ace_energy(pot, ab_data)
     @test all( ace_forces(pot, julip_data) .≈ ace_forces(pot, ab_data) )
     @test ace_virial(pot, julip_data) ≈ ace_virial(pot, ab_data)
+    F = ace_forces(pot, ab_data)
+    @test typeof(F) <: Array
 end
 
 @testset "Units" begin
