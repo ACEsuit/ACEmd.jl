@@ -35,6 +35,7 @@ end
     @test ace_virial(pot, julip_data) ≈ ace_virial(pot, ab_data)
     F = ace_forces(pot, ab_data)
     @test typeof(F) <: Array
+    @test ace_energy(pot, ab_data) ≈ sum( ace_atom_energies(pot, ab_data) )
 end
 
 @testset "Units" begin

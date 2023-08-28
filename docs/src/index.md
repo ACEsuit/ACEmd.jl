@@ -63,6 +63,17 @@ Following units are taken into account
 - `cutoff_unit` defines unit for the cutoff that the potential is using
 
 
+## Energy of each atom
+
+You can get ACE energy of each atom by
+
+```@repl 1
+ace_atom_energies(pot, data)
+```
+
+
+## Index
+
 ```@index
 ```
 
