@@ -6,6 +6,7 @@ import ACE1
 using ACEbase
 @reexport using AtomsBase
 using CellListMap
+using ChunkSplitters
 using Folds
 @reexport using Folds: ThreadedEx, SequentialEx, DistributedEx
 using FLoops

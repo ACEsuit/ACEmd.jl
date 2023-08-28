@@ -112,26 +112,41 @@ use different executors. Look for `ThreadedEx` for more details on how to contro
 - `length_unit`  :   used to override lenght unit for the calculation
 - `cutoff_unit`  :   used to override unit that cutoff radius is defined
 """
-function ace_forces(V, at;
-        domain=1:length(at),
-        executor=ThreadedEx(),
-        energy_unit=default_energy,
-        length_unit=default_length,
-        cutoff_unit=default_length,
-        kwargs...
-    )
+function ace_forces(
+    V,
+    at;
+    domain=1:length(at),
+    executor=ThreadedEx(),
+    ntasks=Threads.nthreads(),
+    energy_unit=default_energy,
+    length_unit=default_length,
+    cutoff_unit=default_length,
+    kwargs...
+)
     nlist = neighborlist(at, get_cutoff(V; cutoff_unit=cutoff_unit) )
-    F = Folds.sum( domain, executor; init=zeros(SVector{3, Float64}, length(at)) ) do i
+    F = Folds.sum( collect(chunks(domain, ntasks)), executor ) do (d, _)
+        ace_forces(V, at, nlist; domain=d)
+    end
+    return F * (energy_unit / length_unit)
+end
+
+
+function ace_forces(
+    V, at, nlist;
+    domain=1:length(at),
+    kwargs...
+)   
+    f = zeros(SVector{3, Float64}, length(at))
+    for i in domain
         j, R, Z = neigsz(nlist, at, i)
         _, tmp = ace_evaluate_d(V, R, Z, _atomic_number(at,i))
 
-        # Force a copy with -1 .* tmp.dV
-        # tmp.dV cannot be used in reduction by itself
-        sv = sparsevec( [j[k] for k in eachindex(j)], -1 .* tmp.dV, length(at) )
-        sv[i] += sum(tmp.dV)
-        sv
+        for k in eachindex(j)
+            f[j[k]] -= tmp.dV[k]
+        end
+        f[i] += sum(tmp.dV)
     end
-    return F * (energy_unit / length_unit)
+    return f
 end
 
 
