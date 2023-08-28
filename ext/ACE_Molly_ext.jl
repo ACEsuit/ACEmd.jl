@@ -11,10 +11,10 @@ function Molly.forces(
         acp::ACEpotential,
         sys,
         neighbors=nothing;
-        n_threads=nothing,
+        n_threads=Threads.nthreads(),
         executor=ThreadedEx()
     )
-    return ace_forces(acp, sys; executor=executor) 
+    return ace_forces(acp, sys; executor=executor, ntasks=n_threads) 
 end
 
 
