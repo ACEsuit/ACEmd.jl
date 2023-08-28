@@ -18,6 +18,7 @@ using StaticArrays
 
 
 # functions
+export ace_atom_energies
 export ace_energy
 export ace_forces
 export ace_virial
