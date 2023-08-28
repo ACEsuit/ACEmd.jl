@@ -44,22 +44,24 @@ for ace_method in [ :ace_energy, :ace_forces, :ace_virial ]
         function $ace_method(calc::AbstractArray, at;
                 domain=1:length(at),
                 executor=ThreadedEx(),
+                ntasks=Threads.nthreads(),
                 energy_unit=default_energy,
                 length_unit=default_length,
                 cutoff_unit=default_length,
                 kwargs...
             )
-            tmp = asyncmap( calc ) do V
-                $ace_method(V, at;
+            tmp = map( calc ) do V
+                Threads.@spawn $ace_method(V, at;
                     domain=domain,
                     executor=executor,
+                    ntasks=ntasks,
                     energy_unit=energy_unit,
                     length_unit=length_unit,
                     cutoff_unit=cutoff_unit,
                     kwargs...
                 )
             end
-            return sum(tmp)
+            return sum(fetch, tmp)
         end
     end
 end
@@ -70,22 +72,24 @@ for ace_method in [ :ace_energy, :ace_forces, :ace_virial ]
         function $ace_method(calc::ACEpotential, at;
                 domain=1:length(at),
                 executor=ThreadedEx(),
+                ntasks=Threads.nthreads(),
                 energy_unit=calc.energy_unit,
                 length_unit=calc.length_unit,
                 cutoff_unit=calc.cutoff_unit,
                 kwargs...
-            )
+        )
             tmp = asyncmap( calc ) do V
                 $ace_method(V, at;
                     domain=domain,
                     executor=executor,
+                    ntasks=ntasks,
                     energy_unit=energy_unit,
                     length_unit=length_unit,
                     cutoff_unit=cutoff_unit,
                     kwargs...
                 )
             end
-            return sum(tmp)
+            return sum( tmp )
         end
     end
 end
@@ -106,8 +110,9 @@ Parallel execution is done with Transducers.jl and there is an option to
 use different executors. Look for `ThreadedEx` for more details on how to control it. 
 
 # Kwargs
-- `domain=1:length(atoms)`  :  choose subset of atoms to which energy is calculated
-- `executor=ThreadedEx()`   :  used to control multithreading using Transducers.jl
+- `domain=1:length(atoms)`          :  choose subset of atoms to which energy is calculated
+- `executor=ThreadedEx()`           :  used to control multithreading using Transducers.jl
+- `ntasks=Threads.nthreads()`       :  how many tasks are used in the calculation
 - `energy_unit`  :   used to override energy unit for the calculation
 - `length_unit`  :   used to override lenght unit for the calculation
 - `cutoff_unit`  :   used to override unit that cutoff radius is defined
@@ -122,7 +127,7 @@ function ace_forces(
     length_unit=default_length,
     cutoff_unit=default_length,
     kwargs...
-)
+)   
     nlist = neighborlist(at, get_cutoff(V; cutoff_unit=cutoff_unit) )
     F = Folds.sum( collect(chunks(domain, ntasks)), executor ) do (d, _)
         ace_forces(V, at, nlist; domain=d)
