@@ -3,6 +3,7 @@ module ACEmd
 using Reexport
 
 import ACE1
+import ACE1x
 using ACEbase
 @reexport using AtomsBase
 using CellListMap
@@ -10,6 +11,7 @@ using ChunkSplitters
 using Folds
 @reexport using Folds: ThreadedEx, SequentialEx, DistributedEx
 using FLoops
+using LinearAlgebra: norm
 using NeighbourLists
 using SparseArrays
 using StaticArrays

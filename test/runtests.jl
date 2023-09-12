@@ -1,5 +1,6 @@
 using ACEmd
 using ACE1
+using ACE1x
 using AtomsBase
 using ExtXYZ
 using Molly
@@ -22,6 +23,35 @@ const u_length = ACEmd.default_length
     @test ace_energy(pot, data) ≈ ACE1.energy(pot_old, data) * u_energy
     @test all( ace_forces(pot, data) .≈ ACE1.forces(pot_old, data) * (u_energy / u_length) )
     @test ace_virial(pot, data) ≈ ACE1.virial(pot_old, data) * (u_energy * u_length)
+
+    @testset "Basis evaluations" begin
+        model = acemodel(
+            elements = [:Ti, :Al],
+			order = 3,
+			totaldegree = 6,
+			rcut = 5.5,
+			Eref = [:Ti => -1586.0195, :Al => -105.5954]
+        )
+        basis = model.basis
+        # ACE basis
+        @test all( ace_energy(basis.BB[2], data) .≈ ACE1.energy(basis.BB[2], data)  )
+        @test (all∘map)( ace_forces(basis.BB[2], data), ACE1.forces(basis.BB[2], data)) do a,b
+            all( a .≈ b  )
+        end
+        @test (all∘map)( ace_virial(basis.BB[2], data), ACE1.virial(basis.BB[2], data)) do a,b
+            all( a .≈ b  )
+        end
+
+        # pair potential basis
+        @test all( ace_energy(basis.BB[1], data) .≈ ACE1.energy(basis.BB[1], data)  )
+        @test (all∘map)( ace_forces(basis.BB[1], data), ACE1.forces(basis.BB[1], data)) do a,b
+            all( a .≈ b  )
+        end
+        @test (all∘map)( ace_virial(basis.BB[1], data), ACE1.virial(basis.BB[1], data)) do a,b
+            all( a .≈ b  )
+        end
+
+    end
 end
 
 
@@ -36,6 +66,37 @@ end
     F = ace_forces(pot, ab_data)
     @test typeof(F) <: Array
     @test ace_energy(pot, ab_data) ≈ sum( ace_atom_energies(pot, ab_data) )
+
+    @test all( ace_energy(pot[3].pibasis, ab_data) .≈ ace_energy(pot[3].pibasis, julip_data)  )
+
+    @testset "Basis evaluations" begin
+        model = acemodel(
+            elements = [:Ti, :Al],
+			order = 3,
+			totaldegree = 6,
+			rcut = 5.5,
+			Eref = [:Ti => -1586.0195, :Al => -105.5954]
+        )
+        basis = model.basis
+        # ACE basis
+        @test all( ace_energy(basis.BB[2], ab_data) .≈ ace_energy(basis.BB[2], julip_data)  )
+        @test (all∘map)( ace_forces(basis.BB[2], ab_data), ace_forces(basis.BB[2], julip_data) ) do a,b
+            all( a .≈ b  )
+        end
+        @test (all∘map)( ace_virial(basis.BB[2], ab_data), ace_virial(basis.BB[2], julip_data) ) do a,b
+            all( a .≈ b  )
+        end
+
+        # pair potential basis
+        @test all( ace_energy(basis.BB[1], ab_data) .≈ ace_energy(basis.BB[1], julip_data)  )
+        @test (all∘map)( ace_forces(basis.BB[1], ab_data), ace_forces(basis.BB[1], julip_data) ) do a,b
+            all( a .≈ b  )
+        end
+        @test (all∘map)( ace_virial(basis.BB[1], ab_data), ace_virial(basis.BB[1], julip_data) ) do a,b
+            all( a .≈ b  )
+        end
+
+    end
 end
 
 @testset "Units" begin

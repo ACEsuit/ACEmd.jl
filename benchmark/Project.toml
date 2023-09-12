@@ -1,5 +1,6 @@
 [deps]
 ACE1 = "e3f9bc04-086e-409a-ba78-e9769fe067bb"
+ACE1x = "5cc4c08c-8782-4a30-af6d-550b302e9707"
 AtomsBase = "a963bdd2-2df7-4f54-a1ee-49d51e6be12a"
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 ExtXYZ = "352459e4-ddd7-4360-8937-99dcb397b478"
