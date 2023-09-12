@@ -11,6 +11,7 @@ using ChunkSplitters
 using Folds
 @reexport using Folds: ThreadedEx, SequentialEx, DistributedEx
 using FLoops
+using LinearAlgebra: norm
 using NeighbourLists
 using SparseArrays
 using StaticArrays

@@ -334,3 +334,55 @@ function ace_forces(
     end
     return f
 end
+
+
+function ace_forces(
+    pair_basis::ACE1.PolyPairBasis,
+    at;
+    domain=1:length(at),
+    executor=ThreadedEx(),
+    ntasks=Threads.nthreads(),
+    cutoff_unit=default_length,
+    kwargs...
+)   
+    nlist = neighborlist(at, get_cutoff(pair_basis; cutoff_unit=cutoff_unit) )
+    pair_data = [ (i, j, R)  for (i,j,R) in pairs(nlist) if i in domain ]
+    F = Folds.sum( collect(chunks(pair_data, ntasks)), executor ) do (d, _)
+        ace_forces(pair_basis, at, pair_data, d)
+    end
+    return [ Vector(f) for f in eachrow(F)]
+end
+
+
+function ace_forces(
+    pair_basis::ACE1.PolyPairBasis,
+    at,
+    pair_data,
+    domain
+)
+    f = zeros(SVector{3, Float64}, length(pair_basis), length(at))
+    tmp = ACE1.alloc_temp_d(pair_basis)
+    #@info "chuck is" pair_domain
+    for I in domain
+        # Pairpotential evaluator from JuLIP.
+        # This is temporary implementation and will be changed in the future
+        i, j, R = pair_data[I]
+        r = norm(R)
+        Zi = _atomic_number(at, i)
+        Zj = _atomic_number(at, j)
+        Ii = ACE1.z2i(pair_basis, Zi)
+        Ij = ACE1.z2i(pair_basis, Zj)
+        dJ = tmp.dJ[Ii, Ij]
+        ACE1.evaluate_d!(tmp.J[Ii, Ij], dJ, tmp.tmpd_J[Ii, Ij], pair_basis.J[Ii, Ij], r, Zi, Zj)
+        idx0 = pair_basis.bidx0[Ii, Ij] 
+        r_tmp = R/(2r)
+        for n = 1:length(pair_basis.J[Ii, Ij])
+            f[idx0 + n, i] +=  dJ[n] * r_tmp
+        end
+        for n = 1:length(pair_basis.J[Ii, Ij])
+            f[idx0 + n, j] -= dJ[n] * r_tmp
+        end
+    end
+    return f
+end
+

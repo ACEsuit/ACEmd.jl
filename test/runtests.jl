@@ -32,6 +32,14 @@ const u_length = ACEmd.default_length
             rcut = 5.5,
         )
         @test all( ace_energy(basis.BB[2], data) .≈ ACE1.energy(basis.BB[2], data)  )
+        @test (all∘map)( ace_forces(basis.BB[2], data), ACE1.forces(basis.BB[2], data)) do a,b
+            all( a .≈ b  )
+        end
+
+        @test all( ace_energy(basis.BB[1], data) .≈ ACE1.energy(basis.BB[1], data)  )
+        @test (all∘map)( ace_forces(basis.BB[1], data), ACE1.forces(basis.BB[1], data)) do a,b
+            all( a .≈ b  )
+        end
 
     end
 end
