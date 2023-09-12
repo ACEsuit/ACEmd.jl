@@ -25,19 +25,29 @@ const u_length = ACEmd.default_length
     @test ace_virial(pot, data) ≈ ACE1.virial(pot_old, data) * (u_energy * u_length)
 
     @testset "Basis evaluations" begin
-        basis = ACE1x.ace_basis(
+        model = acemodel(
             elements = [:Ti, :Al],
-            order = 3,
-            totaldegree = 6,
-            rcut = 5.5,
+			order = 3,
+			totaldegree = 6,
+			rcut = 5.5,
+			Eref = [:Ti => -1586.0195, :Al => -105.5954]
         )
+        basis = model.basis
+        # ACE basis
         @test all( ace_energy(basis.BB[2], data) .≈ ACE1.energy(basis.BB[2], data)  )
         @test (all∘map)( ace_forces(basis.BB[2], data), ACE1.forces(basis.BB[2], data)) do a,b
             all( a .≈ b  )
         end
+        @test (all∘map)( ace_virial(basis.BB[2], data), ACE1.virial(basis.BB[2], data)) do a,b
+            all( a .≈ b  )
+        end
 
+        # pair potential bassis
         @test all( ace_energy(basis.BB[1], data) .≈ ACE1.energy(basis.BB[1], data)  )
         @test (all∘map)( ace_forces(basis.BB[1], data), ACE1.forces(basis.BB[1], data)) do a,b
+            all( a .≈ b  )
+        end
+        @test (all∘map)( ace_virial(basis.BB[1], data), ACE1.virial(basis.BB[1], data)) do a,b
             all( a .≈ b  )
         end
 
