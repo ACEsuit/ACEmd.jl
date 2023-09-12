@@ -37,7 +37,7 @@ vel = random_velocities(sys, temp)
 sys = Molly.System(
     sys;
     velocities = vel,
-    loggers=(temp=TemperatureLogger(100),)
+    loggers=(temp=TemperatureLogger(100),coords=CoordinateLogger(100))
 )
 
 # Set up simulator
@@ -47,6 +47,21 @@ simulator = VelocityVerlet(
 )
 
 
-# Perform MD
-simulate!(sys, simulator, 1000)
+# Perform MD (5291.409519 seconds (60.51 G allocations: 2.689 TiB, 9.38% gc time))
+@time simulate!(sys, simulator, 20_000)
+
+# Plot temperature
+using Plots
+plot(ustrip.(sys.loggers.temp.history)[end-100:end], c="blue", linewidth=3)
+
+# save the trajectory to the .xyz file
+using JuLIP
+at0 = read_extxyz(fname_xyz)[1]
+AT = JuLIP.Atoms{Float64}[];
+for X in sys.loggers.coords.history
+    Xn = ustrip.(X) * 10
+    at = JuLIP.Atoms(:X, Xn, cell=copy(at0.cell), M=copy(at0.M), pbc=true, Z=copy(at0.Z))
+    push!(AT, at)
+end
+write_extxyz("TiAl_ace_md.xyz", AT)
 ```
