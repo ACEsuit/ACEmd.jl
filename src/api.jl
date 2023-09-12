@@ -284,3 +284,53 @@ function ace_atom_energies(V::ACE1.OneBody, as::AbstractSystem; domain=1:length(
     end
     return E * energy_unit
 end
+
+
+## Basis calls
+
+function ace_energy(basis::ACE1.IPBasis, at; domain=1:length(at), cutoff_unit=default_length, executor=ThreadedEx())
+    nlist = neighborlist(at, get_cutoff(basis; cutoff_unit=cutoff_unit) )
+    E = Folds.sum( domain, executor ) do i
+        j, R, Z = neigsz(nlist, at, i)
+        ace_evaluate(basis, R, Z, _atomic_number(at,i))
+    end
+    return E
+end
+
+function ace_forces(
+    basis::ACE1.IPBasis,
+    at;
+    domain=1:length(at),
+    executor=ThreadedEx(),
+    ntasks=Threads.nthreads(),
+    cutoff_unit=default_length,
+    kwargs...
+)   
+    nlist = neighborlist(at, get_cutoff(basis; cutoff_unit=cutoff_unit) )
+    F = Folds.sum( collect(chunks(domain, ntasks)), executor ) do (d, _)
+        ace_forces(basis, at, nlist; domain=d)
+    end
+    return [ Vector(f) for f in eachrow(F)]
+end
+
+
+function ace_forces(
+    shipB::ACE1.IPBasis,
+    at,
+    nlist;
+    domain=1:length(at)
+)
+    f = zeros(SVector{3, Float64}, length(shipB), length(at))
+    for i in domain
+        j, R, Z = neigsz(nlist, at, i)
+        dB = ace_evaluate_d(shipB, R, Z, _atomic_number(at,i))
+
+        for k in eachindex(j)
+            f[:, j[k]] .-= @view dB[:, k]
+        end
+        for k in eachindex(j)
+            f[:,i] .+= @view dB[:, k]
+        end
+    end
+    return f
+end
