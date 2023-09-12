@@ -3,6 +3,7 @@ module ACEmd
 using Reexport
 
 import ACE1
+import ACE1x
 using ACEbase
 @reexport using AtomsBase
 using CellListMap
