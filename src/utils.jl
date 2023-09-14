@@ -68,7 +68,7 @@ end
 
 
 function neighborlist(ab, cutoff; length_unit=default_length, kwargs...)
-    cell = ustrip.(length_unit, hcat( bounding_box(ab)... ) )
+    cell = ustrip.(length_unit, hcat( bounding_box(ab)... )' )
     pbc = map( boundary_conditions(ab) ) do x
         x == Periodic()
     end
