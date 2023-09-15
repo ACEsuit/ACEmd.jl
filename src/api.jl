@@ -288,7 +288,7 @@ end
 
 ## Basis calls
 
-function ace_energy(basis::ACE1.IPBasis, at; domain=1:length(at), cutoff_unit=default_length, executor=ThreadedEx())
+function ace_energy(basis::ACE1.IPBasis, at; domain=1:length(at), cutoff_unit=default_length, executor=ThreadedEx(), kwargs...)
     nlist = neighborlist(at, get_cutoff(basis; cutoff_unit=cutoff_unit) )
     E = Folds.sum( domain, executor ) do i
         j, R, Z = neigsz(nlist, at, i)
