@@ -100,7 +100,7 @@ end
 
 
 function ACEfit.assemble_weights(data::AbstractArray; kwargs...)
-    w = map( vec(data) ) do d
+    w = map( data ) do d
         ACEfit.weight_vector(d; kwargs...)
     end
     return reduce(vcat, w)
@@ -109,7 +109,8 @@ end
 
 function ACEfit.assemble(data::AbstractArray, basis; kwargs...)
     W = Threads.@spawn ACEfit.assemble_weights(data; kwargs...)
-    raw_data = Folds.map( vec(data) ) do d
+    #raw_data = Folds.map( data ) do d # this will bug out
+    raw_data = map( data ) do d
         A = ACEfit.feature_matrix(d, basis; kwargs...)
         Y = ACEfit.target_vector(d; kwargs...)
         (A, Y)
