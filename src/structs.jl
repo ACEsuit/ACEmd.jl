@@ -16,6 +16,21 @@ struct ACEpotential{TE,TL,TC}
 end
 
 
+function ACEpotential(
+    basis::ACE1.MLIPs.IPBasis,
+    constants, 
+    oneparticle::Union{ACE1.OneBody, Nothing}=nothing; 
+    kwargs...
+)
+    if isnothing(oneparticle)
+        pot = ACE1.MLIPs.combine(basis, constants)
+    else
+        pot = ACE1.MLIPs.SumIP(oneparticle, ACE1.MLIPs.combine(basis, constants))
+    end
+    return ACEpotential(pot.components; kwargs...)
+end
+
+
 function Base.iterate(acep::ACEpotential, state::Int=1)
     if 0 < state <= length( acep )
         return acep.potentials[state], state + 1
