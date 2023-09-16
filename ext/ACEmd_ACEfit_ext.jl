@@ -2,7 +2,7 @@ module ACEmd_ACEfit_ext
 
 using ACEfit
 using ACEmd
-using Folds
+using Distributed
 using StaticArrays
 
 function ACEfit.feature_matrix(data, basis; energy=true, force=true, virial=true, kwargs...)
@@ -110,7 +110,7 @@ end
 function ACEfit.assemble(data::AbstractArray, basis; kwargs...)
     W = Threads.@spawn ACEfit.assemble_weights(data; kwargs...)
     #raw_data = Folds.map( data ) do d # this will bug out
-    raw_data = map( data ) do d
+    raw_data = pmap( data ) do d
         A = ACEfit.feature_matrix(d, basis; kwargs...)
         Y = ACEfit.target_vector(d; kwargs...)
         (A, Y)
