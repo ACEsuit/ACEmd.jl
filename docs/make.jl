@@ -18,7 +18,7 @@ makedocs(;
     pages=[
         "Home" => "index.md",
         "Using ACE in Molly" => "molly.md",
-        "Fitting Potential" => "fitting.jl",
+        "Fitting Potential" => "fitting.md",
         "Benchmarks" => "benchmark.md"
     ],
 )
