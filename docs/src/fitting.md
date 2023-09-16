@@ -101,7 +101,7 @@ ACEfit.assemble(data, basis;
 
 ### One Body Potential
 
-One Body Potential is added as a keyword `energy_ref` for `asseble` command. Not giving it means it is not used in training.
+One Body Potential is added as a keyword `energy_ref` for `assemble` command. Not giving it means it is not used in training.
 
 ```julia
 ACEfit.assemble(data, basis; 
