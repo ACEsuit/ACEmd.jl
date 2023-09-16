@@ -77,7 +77,7 @@ function ACEfit.weight_vector(
 )
     blocks = []
     if energy && haskey(data, :energy)
-        e = haskey(data, :energy_weight) ? data[:energy] : energy_default_weight
+        e = haskey(data, :energy_weight) ? data[:energy_weight] : energy_default_weight
         we = e / (sqrt ∘ length)(data)
         push!(blocks, [we])
     end
