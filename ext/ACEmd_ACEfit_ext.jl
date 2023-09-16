@@ -44,7 +44,7 @@ function ACEfit.target_vector(
     kwargs...
 )
     extract_virial(m::AbstractMatrix) = m[SVector(1,5,9,6,3,2)]
-    extract_virial(v::AbstractVector) = extract_virial( reduce(hcat, v) ) # this could be wrong, might need transpose
+    extract_virial(v::AbstractVector) = extract_virial( reduce(hcat, v)' ) # this could be wrong, might need transpose
     
     blocks = []
     if energy && haskey(data, :energy)
