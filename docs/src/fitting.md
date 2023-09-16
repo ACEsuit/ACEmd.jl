@@ -1,6 +1,6 @@
 # Fitting Potentials With ACEfit
 
-ACEmd has an extension fot ACEfit to perform fitting. It is only basic features. For more fitting methods look for [ACEpotenstials](https://github.com/ACEsuit/ACEpotentials.jl).
+ACEmd has an extension fot ACEfit to perform fitting. It is only basic features. For more fitting methods look for [ACEpotentials](https://github.com/ACEsuit/ACEpotentials.jl).
 
 Here is a basic fitting example
  
