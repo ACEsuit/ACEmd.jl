@@ -196,4 +196,5 @@ end
     #@test maximum(abs2,  Y - y  ) < tol
     #@test maximum(abs2,  W - w  ) < tol
     @test size(a,1) == length(y) == length(w)
+    @test size(a,2) == length(basis)
 end
