@@ -455,3 +455,16 @@ function ace_virial(
     end
     return vir
 end
+
+# superbasis stuff
+
+for ace_method in [ :ace_energy, :ace_forces, :ace_virial]
+    @eval begin
+        function $ace_method(basis::ACE1.IPSuperBasis, data; executor=ThreadedEx(), kwargs...)
+            em = Folds.map( basis.BB, executor ) do b
+                $ace_method(b, data; executor=executor, kwargs...)
+            end
+            return reduce(vcat, em)
+        end
+    end
+end
