@@ -63,6 +63,16 @@ Individual weight is given for a specific structure in training data.
 data[1] = FlexibleSystem(data[1]; weight=4)
 ```
 
+Also energy, force and virial can be given individual weight,
+
+```julia
+data[1] = FlexibleSystem(data[1];
+    energy_weight=4,
+    force_weight=2,
+    virial_weight=1.5
+)
+```
+
 ### Control What is Used in Fitting
 
 Training data needs to have comparison data in order for it to be used.
