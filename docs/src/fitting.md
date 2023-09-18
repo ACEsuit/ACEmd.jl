@@ -76,11 +76,17 @@ data[1] = FlexibleSystem(data[1];
 ### Control What is Used in Fitting
 
 Training data needs to have comparison data in order for it to be used.
-The keys for training data that **need** to be are:
+The keys for training data are controlled by keyword arguments:
 
-- `:energy`
-- `:force`
-- `:virial`
+```julia
+ACEfit.assemble(data, basis;
+    energy_key=:energy,
+    force_key=:force,
+    virial_key=:virial
+)
+```
+
+Giving different values allows you to control what names are used for training.
 
 You can test, if individual training point has the property by
 

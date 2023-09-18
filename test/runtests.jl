@@ -197,4 +197,19 @@ end
     #@test maximum(abs2,  W - w  ) < tol
     @test size(a,1) == length(y) == length(w)
     @test size(a,2) == length(basis)
+
+    # change virial key, which leads to virials being skipped
+    a1, y1, w1 = ACEfit.assemble(
+        data, 
+        basis; 
+        energy_default_weight=5, 
+        force_default_weight=2, 
+        virial_default_weight=3,
+        virial_key=:false_virial, 
+        energy_ref=model.Vref
+    )
+    @test size(a1,1) == length(y1) == length(w1)
+    @test size(a,1) != size(a1,1)
+    @test length(y) != length(y1)
+    @test length(w) != length(w1)
 end

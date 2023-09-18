@@ -5,7 +5,16 @@ using ACEmd
 using Distributed
 using StaticArrays
 
-function ACEfit.feature_matrix(data, basis; energy=true, force=true, virial=true, kwargs...)
+function ACEfit.feature_matrix(
+    data,
+    basis; 
+    energy=true, 
+    force=true, 
+    virial=true,
+    energy_key=:energy,
+    force_key=:force,
+    virial_key=:virial,
+    kwargs...)
     # Basis functions are on different collumns.
     # Energy is on fist row.
     # Force is flattened on several rows, so that each basis function is on same collumns.
@@ -13,17 +22,17 @@ function ACEfit.feature_matrix(data, basis; energy=true, force=true, virial=true
     # This is equal to only flattening lower triangular matrix.
 
     blocks = []
-    if energy && haskey(data, :energy)
+    if energy && haskey(data, energy_key)
         e = ace_energy(basis, data; kwargs...)
         push!(blocks, e')
     end
-    if force && haskey(data, :force)
+    if force && haskey(data, force_key)
         f = ace_forces(basis, data; kwargs...)
         tf = reinterpret.(Float64, f)
         f_bock = reduce(hcat, tf)
         push!(blocks, f_bock)
     end
-    if virial && haskey(data, :virial)
+    if virial && haskey(data, virial_key)
         v = ace_virial(basis, data; kwargs...)
         tv = map( v ) do m
             m[SVector(1,5,9,6,3,2)]
@@ -40,6 +49,9 @@ function ACEfit.target_vector(
     energy=true, 
     force=true, 
     virial=true,
+    energy_key=:energy,
+    force_key=:force,
+    virial_key=:virial,
     energy_ref=nothing,
     kwargs...
 )
@@ -47,19 +59,19 @@ function ACEfit.target_vector(
     extract_virial(v::AbstractVector) = extract_virial( reduce(hcat, v)' ) # this could be wrong, might need transpose
     
     blocks = []
-    if energy && haskey(data, :energy)
-        e = data[:energy]
+    if energy && haskey(data, energy_key)
+        e = data[energy_key]
         if !isnothing(energy_ref)
             e -= ace_energy(energy_ref, data) |> ustrip
         end
         push!(blocks, [e])
     end
-    if force && haskey(data, :force)
-        tf = reduce(vcat, data[:force]) # flatten force
+    if force && haskey(data, force_key)
+        tf = reduce(vcat, data[force_key]) # flatten force
         push!(blocks, tf)
     end
-    if virial && haskey(data, :virial)
-        tv = extract_virial( data[:virial] )
+    if virial && haskey(data, virial_key)
+        tv = extract_virial( data[virial_key] )
         push!(blocks, tv)
     end
    return reduce(vcat, blocks)
@@ -69,24 +81,27 @@ function ACEfit.weight_vector(
     data;
     energy=true,
     force=true,
-    virial=true, 
+    virial=true,
+    energy_key=:energy,
+    force_key=:force,
+    virial_key=:virial, 
     energy_default_weight=1, 
     force_default_weight=1, 
     virial_default_weight=1,
     kwargs...
 )
     blocks = []
-    if energy && haskey(data, :energy)
+    if energy && haskey(data, energy_key)
         e = haskey(data, :energy_weight) ? data[:energy_weight] : energy_default_weight
         we = e / (sqrt ∘ length)(data)
         push!(blocks, [we])
     end
-    if force && haskey(data, :force)
+    if force && haskey(data, force_key)
         f = haskey(data, :force_weight) ? data[:force_weight] : force_default_weight
         wf = f * ones(3*length(data))
         push!(blocks, wf)
     end
-    if virial && haskey(data, :virial)
+    if virial && haskey(data, virial_key)
         v = haskey(data, :virial_weight) ? data[:virial_weight] : virial_default_weight
         wv = ( v / (sqrt ∘ length)(data) ) * ones(6)
         push!(blocks, wv)
