@@ -26,13 +26,36 @@ function ACEfit.feature_matrix(
         e = ace_energy(basis, data; kwargs...)
         push!(blocks, e')
     end
-    if force && haskey(data, force_key)
+
+    # check if both force and virial are to be calculated and if so use 
+    # optimized call for them
+    cal_f = force && haskey(data, force_key)
+    cal_v = virial && haskey(data, virial_key)
+    if cal_f && cal_v
+        F_and_V = ace_forces_virial(basis, data; kwargs...)
+
+        f = F_and_V["force"]
+        tf = reinterpret.(Float64, f)
+        f_bock = reduce(hcat, tf)
+        push!(blocks, f_bock)
+
+        v = F_and_V["virial"]
+        tv = map( v ) do m
+            m[SVector(1,5,9,6,3,2)]
+        end
+        v_block = reduce(hcat, tv)
+        push!(blocks, v_block)
+        cal_f = false
+        cal_v = false
+    end
+
+    if cal_f
         f = ace_forces(basis, data; kwargs...)
         tf = reinterpret.(Float64, f)
         f_bock = reduce(hcat, tf)
         push!(blocks, f_bock)
     end
-    if virial && haskey(data, virial_key)
+    if cal_v
         v = ace_virial(basis, data; kwargs...)
         tv = map( v ) do m
             m[SVector(1,5,9,6,3,2)]
