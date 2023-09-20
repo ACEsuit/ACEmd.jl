@@ -8,9 +8,9 @@ using Test
 fname_train = joinpath(pkgdir(ACEmd), "data", "TiAl-train.xyz")
 
 @testset "ACEfit extension" begin
-    #data = ExtXYZ.Atoms.( ExtXYZ.read_frames(fname_train) )
+    data = ExtXYZ.Atoms.( ExtXYZ.read_frames(fname_train) )
     data_julip = read_extxyz( fname_train )
-    data = FlexibleSystem.(data_julip)
+    #data = FlexibleSystem.(data_julip)
 
     model = acemodel(
             elements = [:Ti, :Al],
@@ -19,7 +19,7 @@ fname_train = joinpath(pkgdir(ACEmd), "data", "TiAl-train.xyz")
 			rcut = 5.5,
 			Eref = [:Ti => -1586.0195, :Al => -105.5954]
     )
-    basis = model.basis.BB[2]
+    basis = model.basis
 
     weights = Dict( "default" => Dict("E" => 5.0, "F" => 2.0 , "V" => 3.0 ) )
     datakeys = (energy_key = "energy", force_key = "force", virial_key = "virial")

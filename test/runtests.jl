@@ -167,9 +167,8 @@ end
 
 
 @testset "ACEfit extension" begin
-    #data = ExtXYZ.Atoms.( ExtXYZ.read_frames(fname_train) )
-    data_julip = read_extxyz( fname_train )
-    data = FlexibleSystem.(data_julip)
+    data = ExtXYZ.Atoms.( ExtXYZ.read_frames(fname_train) )
+    #data_julip = read_extxyz( fname_train )
 
     model = acemodel(
             elements = [:Ti, :Al],

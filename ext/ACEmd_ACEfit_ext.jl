@@ -29,7 +29,7 @@ function ACEfit.feature_matrix(
 
     # check if both force and virial are to be calculated and if so use 
     # optimized call for them
-    cal_f = force && haskey(data, force_key)
+    cal_f = force && ( haskey(data, force_key) || hasatomkey(data, force_key) )
     cal_v = virial && haskey(data, virial_key)
     if cal_f && cal_v
         F_and_V = ace_forces_virial(basis, data; kwargs...)
@@ -89,9 +89,14 @@ function ACEfit.target_vector(
         end
         push!(blocks, [e])
     end
-    if force && haskey(data, force_key)
-        tf = reduce(vcat, data[force_key]) # flatten force
-        push!(blocks, tf)
+    if force
+        if haskey(data, force_key)
+            tf = reduce(vcat, data[force_key]) # flatten force
+            push!(blocks, tf)
+        elseif  hasatomkey(data, force_key)
+            tf = reduce(vcat, [ x[force_key] for x in data ] )
+            push!(blocks, tf)
+        end
     end
     if virial && haskey(data, virial_key)
         tv = extract_virial( data[virial_key] )
@@ -119,7 +124,7 @@ function ACEfit.weight_vector(
         we = e / (sqrt ∘ length)(data)
         push!(blocks, [we])
     end
-    if force && haskey(data, force_key)
+    if force && ( haskey(data, force_key) || hasatomkey(data, force_key) )
         f = haskey(data, :force_weight) ? data[:force_weight] : force_default_weight
         wf = f * ones(3*length(data))
         push!(blocks, wf)
