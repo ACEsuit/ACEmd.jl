@@ -83,7 +83,7 @@ function ACEfit.target_vector(
     
     blocks = []
     if energy && haskey(data, energy_key)
-        e = data[energy_key]
+        e = data[energy_key] |> ustrip
         if !isnothing(energy_ref)
             e -= ace_energy(energy_ref, data) |> ustrip
         end
