@@ -1,7 +1,7 @@
 name = "ACEmd"
 uuid = "69e0c927-b120-467d-b2b3-5b6842148cf4"
 authors = ["Teemu Järvinen <teemu.j.jarvinen@gmail.com> and contributors"]
-version = "0.1.6"
+version = "0.1.7-DEV"
 
 [deps]
 ACE1 = "e3f9bc04-086e-409a-ba78-e9769fe067bb"
