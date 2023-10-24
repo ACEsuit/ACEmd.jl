@@ -25,7 +25,7 @@ const u_length = ACEmd.default_length
 
     @test ace_energy(pot, data) ≈ ACE1.energy(pot_old, data) * u_energy
     @test all( ace_forces(pot, data) .≈ ACE1.forces(pot_old, data) * (u_energy / u_length) )
-    @test ace_virial(pot, data) ≈ ACE1.virial(pot_old, data) * (u_energy * u_length)
+    @test ace_virial(pot, data) ≈ ACE1.virial(pot_old, data) * u_energy
 
     @testset "Basis evaluations" begin
         model = acemodel(
@@ -108,11 +108,11 @@ end
 
     @test unit( ace_energy(pot, data) ) == u"eV"
     @test unit( ace_forces(pot, data)[1][1] ) == u"eV" / u"pm"
-    @test unit( ace_virial(pot, data)[1,1] ) == u"eV" * u"pm"
+    @test unit( ace_virial(pot, data)[1,1] ) == u"eV"
 
     @test unit( ace_energy(pot, data; energy_unit=u_energy) ) == u_energy
     @test unit( ace_forces(pot, data;  energy_unit=u_energy, length_unit=u_length)[1][1]) == u_energy / u_length
-    @test unit( ace_virial(pot, data; energy_unit=u_energy, length_unit=u_length)[1,1] ) == u_energy * u_length
+    @test unit( ace_virial(pot, data; energy_unit=u_energy, length_unit=u_length)[1,1] ) == u_energy
 
     @test unit( ACEmd.get_cutoff(pot; cutoff_unit=u"m") ) == u_length
     @test unit( ACEmd.get_cutoff(pot[2]; cutoff_unit=u"pm") ) == u"pm"
