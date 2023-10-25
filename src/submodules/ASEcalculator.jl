@@ -117,6 +117,7 @@ function run_driver(address, pot::ACEmd.ACEpotential, init_structure; port=31415
             pos = recvposdata(comm)
             positions = pos[:positions]
             cell = pos[:cell]
+            @assert length(symbols) == length(position) "recieved amount of position data does no match the atomic symbol data"
             system = FastSystem(cell, pbc, positions, symbols, anumbers, masses)
             data = ace_energy_forces_virial(pot, system)
             has_data = true
