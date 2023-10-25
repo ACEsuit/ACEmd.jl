@@ -79,9 +79,9 @@ function sendforce(comm, e::Number, forces::AbstractVector, virial::AbstractMatr
 end
 
 
-function run_driver(address, pot::ACEmd.ACEpotential, init_structure; port=31415, unixpipe=false )
-    if unixpipe
-        comm = open("/tmp/ipi_"*address)
+function run_driver(address, pot::ACEmd.ACEpotential, init_structure; port=31415, unixsocket=false )
+    if unixsocket
+        comm = connect("/tmp/ipi_"*address)
     else
         comm = connect(address, port)
     end
@@ -117,7 +117,7 @@ function run_driver(address, pot::ACEmd.ACEpotential, init_structure; port=31415
             pos = recvposdata(comm)
             positions = pos[:positions]
             cell = pos[:cell]
-            @assert length(symbols) == length(position) "recieved amount of position data does no match the atomic symbol data"
+            @assert length(symbols) == length(positions) "received amount of position data does no match the atomic symbol data"
             system = FastSystem(cell, pbc, positions, symbols, anumbers, masses)
             data = ace_energy_forces_virial(pot, system)
             has_data = true
