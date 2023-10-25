@@ -112,6 +112,7 @@ function run_driver(address, pot::ACEmd.ACEpotential, init_structure; port=31415
             init = recvinit(comm)
             # we don't init anything for now
             has_init = true
+            has_data = false
         elseif header == "POSDATA"
             pos = recvposdata(comm)
             positions = pos[:positions]
