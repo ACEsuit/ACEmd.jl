@@ -39,5 +39,6 @@ include("api.jl")
 include("backend.jl")
 include("utils.jl")
 include("experimental.jl")
+include("submodules/ASEcalculator.jl")
 
 end
