@@ -26,6 +26,10 @@ end
 
 function recvmsg(comm, nbytes=hdrlen)
     raw_message = read(comm, nbytes)
+    if length(raw_message) == 0
+        @info "Server was probably closed and did not send EXIT"
+        return "EXIT"
+    end
     @assert length(raw_message) == nbytes "recieved message did not have correct lenght"
     message = Char.(raw_message) |> String |> strip
     @info "Recieved message" message
