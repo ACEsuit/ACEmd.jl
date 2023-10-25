@@ -117,6 +117,7 @@ function run_driver(address, pot::ACEmd.ACEpotential, init_structure; port=31415
             has_data = true
         elseif header == "GETFORCE"
             sendforce(comm, data["energy"], data["forces"], data["virial"])
+            has_data = false
         elseif header == "EXIT"
             @info "Exiting calculator" 
             close(comm)
