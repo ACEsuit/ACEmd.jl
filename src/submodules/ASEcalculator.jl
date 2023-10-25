@@ -20,13 +20,13 @@ function sendmsg(comm, message; nbytes=hdrlen)
     else
         error("Message is too long")
     end
-    write(comm, message)
+    write(comm, final_message)
 end
 
 
 function recvmsg(comm, nbytes=hdrlen)
     raw_message = read(comm, nbytes)
-    @assert length(raw_message) == nbytes  "recieved message was not correct"
+    @assert length(raw_message) == nbytes "recieved message did not have correct lenght"
     message = Char.(raw_message) |> String |> strip
     @info "Recieved message" message
     return message
@@ -60,12 +60,14 @@ function recvposdata(comm)
 end
 
 
-function sendforce(comm, e::Number, forces::AbstractArray, virial::AbstractMatrix)
+function sendforce(comm, e::Number, forces::AbstractVector, virial::AbstractMatrix)
+    etype = (eltype ∘ eltype)(forces)
+    f_tmp = reinterpret(reshape, etype, forces)
     sendmsg(comm, "FORCEREADY")
     write(comm, ustrip(u"hartree", e) )
     write(comm, Int32( length(forces) ) )
-    write(comm, usrip.(u"hartree/bohr", forces) )
-    write(comm, usrip.(u"hartree", virial) )
+    write(comm, ustrip.(u"hartree/bohr", f_tmp) )
+    write(comm, ustrip.(u"hartree", virial) )
 
     # Send single byte at end to make sure we are alive
     write(comm, one(Int32) )
@@ -96,11 +98,11 @@ function run_driver(address, pot::ACEmd.ACEpotential, init_structure; port=31415
 
         if header == "STATUS"
             if !has_init
-                sendmsg("NEEDINIT")
+                sendmsg(comm, "NEEDINIT")
             elseif has_data
-                sendmsg("HAVEDATA")
+                sendmsg(comm, "HAVEDATA")
             else
-                sendmsg("READY")
+                sendmsg(comm, "READY")
             end
         elseif header == "INIT"
             init = recvinit(comm)
