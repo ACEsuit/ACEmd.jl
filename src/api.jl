@@ -205,17 +205,17 @@ function ace_virial(V, at;
         end
         site_virial
     end
-    return vir * (energy_unit * length_unit)
+    return vir * energy_unit 
 end
 
 function ace_virial(::ACE1.OneBody, at::ACE1.Atoms; energy_unit=default_energy, length_unit=default_length, kwargs...)
     T = (eltype ∘ eltype)(at.X)
-    return SMatrix{3,3}(zeros(T, 3,3)) * (energy_unit * length_unit)
+    return SMatrix{3,3}(zeros(T, 3,3)) * energy_unit
 end
 
 function ace_virial(::ACE1.OneBody, as::AbstractSystem; energy_unit=default_energy, length_unit=default_length, kwargs...)
     T = eltype( ustrip.( position( as[begin] ) )  )
-    return SMatrix{3,3}(zeros(T, 3,3)) * (energy_unit * length_unit)
+    return SMatrix{3,3}(zeros(T, 3,3)) * energy_unit
 end
 
 
