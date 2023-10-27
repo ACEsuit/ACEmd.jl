@@ -9,6 +9,7 @@ using Unitful
 export ase_energy
 export ase_forces
 export ase_virial
+export ase_energy_forces_virial
 export load_ace_model
 
 
@@ -46,7 +47,6 @@ function ase_forces(
 )
     sys = make_system(atom_symbols, positions, cell, pbc)
     f = ace_forces(potential, sys)
-    unit(f[1][1])
     fm = reinterpret(reshape, typeof(1.0*unit(f[1][1])), f)
     return ustrip.(u"eV/Å", fm)'  # we need transpose for python
 end
@@ -61,6 +61,22 @@ function ase_virial(
     sys = make_system(atom_symbols, positions, cell, pbc)
     v = ace_virial(potential, sys)
     return ustrip.(u"eV", v)'  # we need transpose for python
+end
+
+function ase_energy_forces_virial(
+    potential,
+    atom_symbols,
+    positions,
+    cell,
+    pbc,
+)
+    sys = make_system(atom_symbols, positions, cell, pbc)
+    tmp = ace_energy_forces_virial(potential, sys)
+    f = tmp["forces"]
+    fm = reinterpret(reshape, typeof(1.0*unit(f[1][1])), f)
+    e = tmp["energy"]
+    v = tmp["virial"]
+    return ustrip(u"eV", e), ustrip.(u"eV/Å", fm), ustrip.(u"eV", v)
 end
 
 
