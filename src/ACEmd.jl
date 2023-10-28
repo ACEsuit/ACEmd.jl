@@ -39,5 +39,7 @@ include("api.jl")
 include("backend.jl")
 include("utils.jl")
 include("experimental.jl")
+include("submodules/ASEhelper.jl")
+include("submodules/IPIprotocol.jl")
 
 end
