@@ -12,7 +12,7 @@ using ExtXYZ
 
 # Load training data
 fname_train = joinpath(pkgdir(ACEmd), "data", "TiAl-train.xyz")
-data = ExtXYZ.Atoms.( ExtXYZ.read_frames(fname_train) )
+data = ExtXYZ.load(fname_train)
 
 # Generate ACE basis to be trained
 basis = ACE1x.ace_basis(

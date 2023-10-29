@@ -18,7 +18,7 @@ using ExtXYZ
 fname_ace = joinpath(pkgdir(ACEmd), "data", "TiAl.json")
 fname_xyz = joinpath(pkgdir(ACEmd), "data", "TiAl-big.xyz")
 
-data = FastSystem(ExtXYZ.Atoms(read_frame(fname_xyz)))
+data = ExtXYZ.load(fname_xyz)
 pot = load_ace_model(fname_ace)
 
 # use ACE to calculate...
