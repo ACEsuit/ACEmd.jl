@@ -99,66 +99,8 @@ end
 
 
 
- ## CellListMap
-
 function neighborlist(at::ACE1.Atoms, cutoff; kwargs...)
     return ACE1.neighbourlist(at, ustrip(u"Å", cutoff); kwargs...)
-end
-
-
-function neighborlist_clm(ab::AbstractSystem, cutoff; kwargs...)
-    function push_pair!(i, j, x, y, d2, pairs, cutoff) 
-        d = sqrt(d2)
-        if d < cutoff
-            push!(pairs, (i, j, ustrip.(y-x)))
-        end
-        return pairs
-    end
-    function reduce_pairs(pairs, pairs_threaded)
-        for i in eachindex(pairs_threaded)
-            append!(pairs, pairs_threaded[i])
-        end
-        return pairs
-    end
-    ucutoff = cutoff*u"Å"  # ACE cutoff is in Å
-    tmp = bounding_box(ab)
-    cell = [ tmp[i][i] for i in eachindex(tmp) ]
-
-    box = Box(cell, ucutoff)
-    
-    #TODO allow dynamic types here
-    pairs = Tuple{Int,Int, SVector{3, Float64}}[]
-
-    cl = CellList(position(ab), box, parallel=true)
-
-    map_pairwise!(
-        (x, y, i, j, d2, pairs) -> push_pair!(i, j, x, y, d2, pairs, ucutoff),
-        pairs,box,cl,
-        reduce=reduce_pairs,
-        parallel=true
-    )
-    return pairs
-end
-
-
-function neigsz(list, ab, i)
-    T = typeof( list[begin][3] )
-    R = T[]
-    j = Int[]
-    Z = AtomicNumber[] # JuLIP from ACE1
-
-    for x in list
-        if x[1] == i
-            push!(R, x[3])
-            push!(j, x[2])
-            push!(Z, _atomic_number(ab,x[2]))
-        elseif x[2] == i
-            push!(R, -x[3])
-            push!(j, x[1])
-            push!(Z, _atomic_number(ab,x[1]))
-        end
-    end
-    return j, R, Z
 end
 
 
