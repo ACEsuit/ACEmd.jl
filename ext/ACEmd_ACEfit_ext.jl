@@ -34,12 +34,12 @@ function ACEfit.feature_matrix(
     if cal_f && cal_v
         F_and_V = ace_forces_virial(basis, data; kwargs...)
 
-        f = F_and_V["force"]
+        f = F_and_V[:forces]
         tf = reinterpret.(Float64, f)
         f_bock = reduce(hcat, tf)
         push!(blocks, f_bock)
 
-        v = F_and_V["virial"]
+        v = F_and_V[:virial]
         tv = map( v ) do m
             m[SVector(1,5,9,6,3,2)]
         end

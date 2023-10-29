@@ -6,11 +6,9 @@ import ACE1
 import ACE1x
 using ACEbase
 @reexport using AtomsBase
-using CellListMap
 using ChunkSplitters
 using Folds
 @reexport using Folds: ThreadedEx, SequentialEx, DistributedEx
-using FLoops
 using LinearAlgebra: norm
 using NeighbourLists
 using SparseArrays
@@ -38,7 +36,6 @@ include("structs.jl")
 include("api.jl")
 include("backend.jl")
 include("utils.jl")
-include("experimental.jl")
 include("submodules/ASEhelper.jl")
 include("submodules/IPIprotocol.jl")
 

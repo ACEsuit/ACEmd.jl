@@ -225,7 +225,8 @@ end
 function ace_energy_forces(pot, data; kwargs...)
     E = ace_energy(pot, data; kwargs...)
     F = ace_forces(pot, data; kwargs...)
-    return Dict("energy"=>E, "forces"=>F)
+    #return Dict("energy"=>E, "forces"=>F)
+    return (; :energy=>E, :forces=>F)
 end
 
 
@@ -233,13 +234,14 @@ function ace_energy_forces_virial(pot, data; kwargs...)
     E = ace_energy(pot, data; kwargs...)
     F = ace_forces(pot, data; kwargs...)
     V = ace_virial(pot, data; kwargs...)
-    return Dict("energy"=>E, "forces"=>F, "virial"=>V)
+    #return Dict("energy"=>E, "forces"=>F, "virial"=>V)
+    return (; :energy=>E, :forces=>F, :virial=>V)
 end
 
 function ace_forces_virial(pot, data; kwargs...)
     F = ace_forces(pot, data; kwargs...)
     V = ace_virial(pot, data; kwargs...)
-    return Dict("forces"=>F, "virial"=>V)
+    return (; :forces=>F, :virial=>V)
 end
 
 
@@ -476,11 +478,11 @@ function ace_forces_virial(basis::ACE1.IPSuperBasis, data; kwargs...)
         Threads.@spawn ace_forces_virial(b, data; kwargs...)
     end
     final_data = [ fetch(x) for x in em ]
-    Farrays = [ x["force"] for x in final_data ]
-    Varrays = [ x["virial"] for x in final_data ]
+    Farrays = [ x[:forces] for x in final_data ]
+    Varrays = [ x[:virial] for x in final_data ]
     F = reduce(vcat, Farrays)
     V = reduce(vcat, Varrays)
-    return Dict("force"=>F, "virial"=>V)
+    return (; :forces=>F, :virial=>V)
 end
 
 # special combination calls for extra speed
@@ -496,10 +498,11 @@ function ace_forces_virial(
 )   
     nlist = neighborlist(at, get_cutoff(basis; cutoff_unit=cutoff_unit) )
     F_and_V = Folds.sum( collect(chunks(domain, ntasks)), executor ) do (d, _)
-        ace_forces_virial(basis, at, nlist; domain=d)
+        f, v = ace_forces_virial(basis, at, nlist; domain=d)
+        [f, v]
     end
     F = [ Vector(f) for f in eachrow(F_and_V[1])]
-    return Dict("force"=>F, "virial"=>F_and_V[2])
+    return (; :forces=>F, :virial=>F_and_V[2])
 end
 
 
@@ -528,7 +531,7 @@ function ace_forces_virial(
             vir[ib] += site_virial
         end
     end
-    return [f, vir]
+    return (; :forces=>f, :virial=>vir)
 end
 
 
@@ -544,10 +547,11 @@ function ace_forces_virial(
     nlist = neighborlist(at, get_cutoff(pair_basis; cutoff_unit=cutoff_unit) )
     pair_data = [ (i, j, R)  for (i,j,R) in pairs(nlist) if i in domain ]
     F_and_V = Folds.sum( collect(chunks(pair_data, ntasks)), executor ) do (d, _)
-        ace_forces_virial(pair_basis, at, pair_data, d)
+       f, v = ace_forces_virial(pair_basis, at, pair_data, d)
+       [f, v]
     end
     F = [ Vector(f) for f in eachrow(F_and_V[1])]
-    return Dict("force"=>F, "virial"=>F_and_V[2])
+    return (; :forces=>F, :virial=>F_and_V[2])
 end
 
 
@@ -587,5 +591,5 @@ function ace_forces_virial(
         end
         #
     end
-    return [f, vir]
+    return (; :forces=>f, :virial=>vir)
 end
