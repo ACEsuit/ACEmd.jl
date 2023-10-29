@@ -138,15 +138,15 @@ end
     ace_efv = ace_energy_forces_virial(pot, data)
     ace_fv = ace_forces_virial(pot, data)
 
-    @test ace_ef["energy"] ≈ E
-    @test all( ace_ef["forces"] .≈ F )
+    @test ace_ef[:energy] ≈ E
+    @test all( ace_ef[:forces] .≈ F )
     
-    @test ace_efv["energy"] ≈ E
-    @test all( ace_efv["forces"] .≈ F )
-    @test ace_efv["virial"] ≈ V
+    @test ace_efv[:energy] ≈ E
+    @test all( ace_efv[:forces] .≈ F )
+    @test ace_efv[:virial] ≈ V
 
-    @test all( ace_fv["forces"] .≈ F )
-    @test ace_fv["virial"] ≈ V
+    @test all( ace_fv[:forces] .≈ F )
+    @test ace_fv[:virial] ≈ V
 end
 
 @testset "Molly support" begin
@@ -167,7 +167,7 @@ end
 
 
 @testset "ACEfit extension" begin
-    data = ExtXYZ.Atoms.( ExtXYZ.read_frames(fname_train) )
+    data = ExtXYZ.load(fname_train)
     #data_julip = read_extxyz( fname_train )
 
     model = acemodel(
