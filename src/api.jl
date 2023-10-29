@@ -482,7 +482,6 @@ function ace_forces_virial(basis::ACE1.IPSuperBasis, data; kwargs...)
     Varrays = [ x[:virial] for x in final_data ]
     F = reduce(vcat, Farrays)
     V = reduce(vcat, Varrays)
-    #return Dict("force"=>F, "virial"=>V)
     return (; :forces=>F, :virial=>V)
 end
 
@@ -503,7 +502,6 @@ function ace_forces_virial(
         [f, v]
     end
     F = [ Vector(f) for f in eachrow(F_and_V[1])]
-    #return Dict("force"=>F, "virial"=>F_and_V[2])
     return (; :forces=>F, :virial=>F_and_V[2])
 end
 
@@ -533,7 +531,6 @@ function ace_forces_virial(
             vir[ib] += site_virial
         end
     end
-    #return [f, vir]
     return (; :forces=>f, :virial=>vir)
 end
 
@@ -554,7 +551,6 @@ function ace_forces_virial(
        [f, v]
     end
     F = [ Vector(f) for f in eachrow(F_and_V[1])]
-    #return Dict("force"=>F, "virial"=>F_and_V[2])
     return (; :forces=>F, :virial=>F_and_V[2])
 end
 
@@ -595,6 +591,5 @@ function ace_forces_virial(
         end
         #
     end
-    #return [f, vir]
     return (; :forces=>f, :virial=>vir)
 end
