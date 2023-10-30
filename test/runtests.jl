@@ -3,6 +3,7 @@ using ACE1
 using ACE1x
 using ACEfit
 using AtomsBase
+using AtomsCalculators.AtomsCalculatorsTesting
 using ExtXYZ
 using Molly
 using Unitful
@@ -211,4 +212,14 @@ end
     @test size(a,1) != size(a1,1)
     @test length(y) != length(y1)
     @test length(w) != length(w1)
+end
+
+
+@testset "AtomsCalculators interface" begin
+    pot = load_ace_model(fname_ace)
+    data = ExtXYZ.load(fname_xyz)
+
+    test_potential_energy(data, pot)
+    test_forces(data, pot)
+    test_virial(data, pot)
 end

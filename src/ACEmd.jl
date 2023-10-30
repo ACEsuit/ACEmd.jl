@@ -6,6 +6,7 @@ import ACE1
 import ACE1x
 using ACEbase
 @reexport using AtomsBase
+using AtomsCalculators
 using ChunkSplitters
 using Folds
 @reexport using Folds: ThreadedEx, SequentialEx, DistributedEx
@@ -36,6 +37,7 @@ include("structs.jl")
 include("api.jl")
 include("backend.jl")
 include("utils.jl")
+include("atoms_calculators.jl")
 include("submodules/ASEhelper.jl")
 include("submodules/IPIprotocol.jl")
 
