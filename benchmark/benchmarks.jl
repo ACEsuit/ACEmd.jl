@@ -15,8 +15,15 @@ pot = load_ace_model(fname_ace)
 pot_julip = load_ace_model(fname_ace; old_format=true)
 data_julip = read_extxyz(fname_xyz)[end]
 data_julip_huge = read_extxyz(fname_xyz_huge)[end]
-data = FastSystem(ExtXYZ.Atoms(read_frame(fname_xyz)))
-data_huge = FastSystem(ExtXYZ.Atoms(read_frame(fname_xyz_huge)))
+data = FastSystem(ExtXYZ.load(fname_xyz))
+data_huge = FastSystem(ExtXYZ.load(fname_xyz_huge))
+
+function julip_combination(pot, data)
+    e = ACE1.energy(pot, data)
+    f = ACE1.forces(pot, data)
+    v = ACE1.virial(pot, data)
+    return e, f, v
+end
 
 model = acemodel(
     elements = [:Ti, :Al],
@@ -32,12 +39,14 @@ basis = model.basis
 SUITE["JuLIP"] = BenchmarkGroup([],
         "energy" => BenchmarkGroup(),
         "forces" => BenchmarkGroup(),
-        "virial" => BenchmarkGroup()
+        "virial" => BenchmarkGroup(),
+        "combination"=> BenchmarkGroup(),
 )
 SUITE["AtomsBase"] = BenchmarkGroup([],
         "energy" => BenchmarkGroup(),
         "forces" => BenchmarkGroup(),
-        "virial" => BenchmarkGroup()
+        "virial" => BenchmarkGroup(),
+        "combination"=> BenchmarkGroup(),
 )
 
 SUITE["JuLIP"]["energy"]["big"] = @benchmarkable ACE1.energy($pot_julip, $data_julip)
@@ -61,7 +70,12 @@ SUITE["AtomsBase"]["virial"]["big"] = @benchmarkable ace_virial($pot, $data)
 SUITE["AtomsBase"]["virial"]["huge"] = @benchmarkable ace_virial($pot, $data_huge)
 SUITE["AtomsBase"]["virial"]["basis"] = @benchmarkable ace_virial($(basis.BB[2]), $data)
 
-
+SUITE["AtomsBase"]["combination"]["big"] = @benchmarkable ace_energy_forces_virial($pot, $data)
+SUITE["AtomsBase"]["combination"]["huge"] = @benchmarkable ace_energy_forces_virial($pot, $data_huge)
+SUITE["AtomsBase"]["combination"]["basis"] = @benchmarkable ace_energy_forces_virial($(basis.BB[2]), $data)
+SUITE["JuLIP"]["combination"]["big"] = @benchmarkable julip_combination($pot_julip, $data_julip)
+SUITE["JuLIP"]["combination"]["huge"] = @benchmarkable julip_combination($pot_julip, $data_julip_huge)
+SUITE["JuLIP"]["combination"]["basis"] = @benchmarkable julip_combination($(basis.BB[2]), $data_julip)
 
 ## These test serial calculations compared to default async
 ## They should be always slower so skipping them here
