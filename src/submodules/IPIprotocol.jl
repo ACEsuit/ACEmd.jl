@@ -88,6 +88,10 @@ end
 Connect I-PI driver to server at given `address`. Use kword `port` (default 31415) to
 specify port. If kword `unixsocket` is true, `address` is understood to be the name of the socket
 and `port` option is ignored.
+
+You need to give initial structure as I-PI protocol does not transfer atom symbols.
+This means that, if you want to change the number of atoms or their symbols, you need
+to lauch a new driver.
 """
 function run_driver(address, potential, init_structure; port=31415, unixsocket=false )
     if unixsocket
