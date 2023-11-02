@@ -6,7 +6,7 @@ CurrentModule = ACEmd
 
 [ACEmd](https://github.com/acesuit/ACEmd.jl) is molecular dynamics interface for Julia ACE. All MD use cases should use this package.
 
-ACEmd is fully [AtomsBase](https://github.com/JuliaMolSim/AtomsBase.jl) compatable and you should use AtomsBase over older JuLIP. You can still use JuLIP `Atoms` type as an input, while in a long run JuLIP will be decomissioned.
+ACEmd is fully [AtomsBase](https://github.com/JuliaMolSim/AtomsBase.jl) compatible and you should use AtomsBase over older JuLIP. You can still use JuLIP `Atoms` type as an input, while in a long run JuLIP will be decommissioned.
 
 ## Example use case
 
@@ -50,7 +50,7 @@ pot_ev = load_ace_model(fname_ace;
 ace_energy(pot_ev, data)
 ```
 
-Alternatively you can overload the default unit by giving it explicitely
+Alternatively you can overload the default unit by giving it explicitly
 
 ```@repl 1
 ace_energy(pot_ev, data; energy_unit=u"hartree")
