@@ -78,5 +78,5 @@ ace_atom_energies(pot, data)
 ```
 
 ```@autodocs
-Modules = [ACEmd]
+Modules = [ACEmd, ACEmd.IPIprotocol]
 ```
