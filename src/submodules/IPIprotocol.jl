@@ -1,9 +1,13 @@
 module IPIprotocol
+# This is AtomsCalculators implementation for i-PI protocol.
+# For reference see https://github.com/i-pi/i-pi/blob/master/drivers/py/driver.py
 
-using ..ACEmd
+using AtomsBase
+using AtomsCalculators
 using Sockets
 using StaticArrays
-# i-PI example https://github.com/i-pi/i-pi/blob/master/drivers/py/driver.py
+using Unitful
+using UnitfulAtomic
 
 export run_driver
 
@@ -78,8 +82,18 @@ function sendforce(comm, e::Number, forces::AbstractVector, virial::AbstractMatr
     write(comm, zero(UInt8) )
 end
 
+"""
+    run_driver(address, potential, init_structure; port=31415, unixsocket=false )
 
-function run_driver(address, pot::ACEmd.ACEpotential, init_structure; port=31415, unixsocket=false )
+Connect I-PI driver to server at given `address`. Use kword `port` (default 31415) to
+specify port. If kword `unixsocket` is true, `address` is understood to be the name of the socket
+and `port` option is ignored.
+
+You need to give initial structure as I-PI protocol does not transfer atom symbols.
+This means that, if you want to change the number of atoms or their symbols, you need
+to lauch a new driver.
+"""
+function run_driver(address, potential, init_structure; port=31415, unixsocket=false )
     if unixsocket
         comm = connect("/tmp/ipi_"*address)
     else
@@ -119,10 +133,10 @@ function run_driver(address, pot::ACEmd.ACEpotential, init_structure; port=31415
             cell = pos[:cell]
             @assert length(symbols) == length(positions) "received amount of position data does no match the atomic symbol data"
             system = FastSystem(cell, pbc, positions, symbols, anumbers, masses)
-            data = ace_energy_forces_virial(pot, system)
+            data = AtomsCalculators.energy_forces_virial(system, potential)
             has_data = true
         elseif header == "GETFORCE"
-            sendforce(comm, data["energy"], data["forces"], data["virial"])
+            sendforce(comm, data[:energy], data[:forces], data[:virial])
             has_data = false
         elseif header == "EXIT"
             @info "Exiting calculator" 
