@@ -1,7 +1,7 @@
 name = "ACEmd"
 uuid = "69e0c927-b120-467d-b2b3-5b6842148cf4"
 authors = ["Teemu Järvinen <teemu.j.jarvinen@gmail.com> and contributors"]
-version = "0.1.8"
+version = "0.1.9-DEV"
 
 
 [deps]
@@ -31,7 +31,7 @@ ACE_Molly_ext = "Molly"
 ACEmd_ACEfit_ext = "ACEfit"
 
 [compat]
-ACE1 = "0.11.5"
+ACE1 = "0.11.5, 0.12"
 ACE1x = "0.1.8"
 ACEbase = "0.4.3"
 ACEfit = "0.1.4"
