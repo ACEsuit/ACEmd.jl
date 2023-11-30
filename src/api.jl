@@ -221,9 +221,7 @@ end
 
 function ace_energy_forces_virial(pot, data; kwargs...)
     E = ace_energy(pot, data; kwargs...)
-    F = ace_forces(pot, data; kwargs...)
-    V = ace_virial(pot, data; kwargs...)
-    #return Dict("energy"=>E, "forces"=>F, "virial"=>V)
+    F, V = ace_forces_virial(pot, data; kwargs...)
     return (; :energy=>E, :forces=>F, :virial=>V)
 end
 
@@ -232,6 +230,60 @@ function ace_forces_virial(pot, data; kwargs...)
     V = ace_virial(pot, data; kwargs...)
     return (; :forces=>F, :virial=>V)
 end
+
+function ace_forces_virial(pot::ACEpotential, data; kwargs...)
+    tmp = map( pot.potentials ) do pot
+        Threads.@spawn _ace_forces_virial( pot, data, kwargs...)
+    end
+    F_V = sum( tmp ) do t
+        f, v = fetch(t)
+        [f, v]
+    end
+    return (; :forces=>F_V[1], :virial=>F_V[2] )
+end
+
+
+function _ace_forces_virial(::ACE1.OneBody, as::AbstractSystem; energy_unit=default_energy, length_unit=default_length, kwargs...)
+    T = eltype( ustrip.( position(as, 1) )  )
+    F = [ SVector{3}( zeros(T, 3) ) * (energy_unit / length_unit) for _ in 1:length(as) ]
+    V = SMatrix{3,3}(zeros(T, 3,3)) * energy_unit
+    return (; :forces => F, :virial => V)
+end
+
+function _ace_forces_virial(
+    V, 
+    at;
+    domain=1:length(at),
+    executor=ThreadedEx(),
+    ntasks=Threads.nthreads(),
+    energy_unit=default_energy,
+    length_unit=default_length,
+    cutoff_unit=default_length,
+    kwargs...
+)
+    nlist = neighborlist(at, get_cutoff(V; cutoff_unit=cutoff_unit) )
+    F_V = Folds.sum( collect(chunks(domain, ntasks)), executor ) do (sub_domain, _)
+        f = zeros(SVector{3, Float64}, length(at))
+        virial_sum = zeros(SMatrix{3,3,Float64})
+        for i in sub_domain
+            j, R, Z = neigsz(nlist, at, i)
+            _, tmp = ace_evaluate_d(V, R, Z, _atomic_number(at,i))
+
+            f[j] -= tmp.dV
+            f[i] += sum(tmp.dV)
+
+            virial_sum -= sum( zip(R, tmp.dV) ) do (Rⱼ, dVⱼ)
+                dVⱼ * Rⱼ'
+            end
+        end
+        [f, virial_sum]
+    end
+    return (;
+        :forces => F_V[1] * energy_unit / length_unit,
+        :virial => F_V[2] * energy_unit
+    )
+end
+
 
 
 ## Individual atom energies
