@@ -78,8 +78,8 @@ for ace_method in [ :ace_energy, :ace_forces, :ace_virial, :ace_atom_energies ]
                 cutoff_unit=calc.cutoff_unit,
                 kwargs...
         )
-            tmp = asyncmap( calc ) do V
-                $ace_method(V, at;
+            tmp = map( calc ) do V
+                Threads.@spawn $ace_method(V, at;
                     domain=domain,
                     executor=executor,
                     ntasks=ntasks,
@@ -89,7 +89,7 @@ for ace_method in [ :ace_energy, :ace_forces, :ace_virial, :ace_atom_energies ]
                     kwargs...
                 )
             end
-            return sum( tmp )
+            return sum(fetch, tmp)
         end
     end
 end
@@ -130,29 +130,18 @@ function ace_forces(
     kwargs...
 )   
     nlist = neighborlist(at, get_cutoff(V; cutoff_unit=cutoff_unit) )
-    F = Folds.sum( collect(chunks(domain, ntasks)), executor ) do (d, _)
-        ace_forces(V, at, nlist; domain=d)
+    F = Folds.sum( collect(chunks(domain, ntasks)), executor ) do (sub_domain, _)
+        f = zeros(SVector{3, Float64}, length(at))
+        for i in sub_domain
+            j, R, Z = neigsz(nlist, at, i)
+            _, tmp = ace_evaluate_d(V, R, Z, _atomic_number(at,i))
+
+            f[j] -= tmp.dV
+            f[i] += sum(tmp.dV)
+        end
+        f
     end
     return F * (energy_unit / length_unit)
-end
-
-
-function ace_forces(
-    V, at, nlist;
-    domain=1:length(at),
-    kwargs...
-)   
-    f = zeros(SVector{3, Float64}, length(at))
-    for i in domain
-        j, R, Z = neigsz(nlist, at, i)
-        _, tmp = ace_evaluate_d(V, R, Z, _atomic_number(at,i))
-
-        for k in eachindex(j)
-            f[j[k]] -= tmp.dV[k]
-        end
-        f[i] += sum(tmp.dV)
-    end
-    return f
 end
 
 
