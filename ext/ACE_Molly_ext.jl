@@ -6,32 +6,7 @@ using AtomsBase
 using LinearAlgebra: isdiag
 using Molly
 
-
-function Molly.forces(
-        acp::ACEpotential,
-        sys,
-        neighbors=nothing;
-        n_threads=Threads.nthreads(),
-        executor=ThreadedEx()
-    )
-    return ace_forces(acp, sys; executor=executor, ntasks=n_threads) 
-end
-
-
-function Molly.potential_energy(
-        acp::ACEpotential,
-        sys,
-        neighbors=nothing;
-        n_threads=nothing,
-        executor=ThreadedEx()
-    )
-    return ace_energy(acp, sys; executor=executor) 
-end
  
-
-function ACEmd._atomic_number(sys::Molly.System, i) 
-    return AtomicNumber( sys.atoms_data[i].Z )
-end
 
 function Molly.System(
         sys::AbstractSystem,
@@ -56,12 +31,9 @@ function Molly.System(
         end
         tmp
     end
-
-    atom_data = [ (; :Z=>z,:element=>s)  for (z,s) in zip(atomic_number(sys), atomic_symbol(sys))  ]
     
     return Molly.System(
         atoms=atoms,
-        atoms_data = atom_data,
         coords= map(sys) do r
             SVector(position(r)...)
         end,
