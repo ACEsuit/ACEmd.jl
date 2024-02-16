@@ -20,7 +20,8 @@ function Molly.System(
     @assert dimension(force_units) == dimension(u"kg*m/s^2")  "force unit has wrong dimenstions"
     @assert dimension(velocity_units) == dimension(u"m/s")  "velocity unit has wrong dimenstions"
 
-    atoms = [Molly.Atom( index=i, mass=atomic_mass(sys, i) ) for i in 1:length(sys) ]
+    atoms = [Molly.Atom(; index=i, mass=atomic_mass(sys, i) ) for i in 1:length(sys) ]
+    atoms_data = [ Molly.AtomData(; element=String(atomic_symbol(sys,i))) for i in 1:length(sys)]
 
     boundary = begin
         box = bounding_box(sys)
@@ -32,8 +33,9 @@ function Molly.System(
         tmp
     end
     
-    return Molly.System(
+    return Molly.System(;
         atoms=atoms,
+        atoms_data=atoms_data,
         coords= map(sys) do r
             SVector(position(r)...)
         end,
