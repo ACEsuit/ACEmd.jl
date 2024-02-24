@@ -3,10 +3,7 @@
 ACE support for [Molly](https://github.com/JuliaMolSim/Molly.jl) is loaded with Julia package extensions.
 To use you need to use at least v1.9 of Julia. You also need to have both Molly and ACEapi added to the environment you are using, for extension to be loaded.
 
-There are couple of notes that need to be understood.
-
-- Default unit for energy in Molly is kJ/mol. You need to change this to anything that is not per mole (same for force units)
-- As of writing this Molly does not have fully compatible AtomsBase interface. So building `System` structure is a bit clunky. Most of all, `atoms_data` needs to have defined `element` for atomic symbol and `Z` for nuclear charge. As these are needed by ACE.
+You need to understand that by default Molly uses kJ/mol for energy. This is not compatible with ACEmd and AtomsCalculators, so you need to change the energy unit. ACEmd adds convenience functions to do this for you and at the same time initialize the system.
 
 ## Example
 
@@ -25,8 +22,8 @@ fname_xyz = joinpath(pkgdir(ACEmd), "data", "TiAl-big.xyz")
 data = ExtXYZ.Atoms(read_frame(fname_xyz))
 pot = load_ace_model(fname_ace)
 
-# Pack data to Molly compatible format
-# data is AtomsBase compatible structure
+# Insert the potential to Molly and change the units
+# to reflect this. Also initializes system structure.
 sys = Molly.System(data, pot)
 
 # Set up temperature and velocities
