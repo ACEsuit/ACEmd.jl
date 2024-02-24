@@ -106,4 +106,4 @@ end
 
 
 _atomic_number(at::ACE1.Atoms, i)          = at.Z[i]
-_atomic_number(ab::AbstractSystem, i) = ACE1.AtomicNumber(AtomsBase.atomic_number(ab,i))
+_atomic_number(ab, i) = ACE1.AtomicNumber(AtomsBase.atomic_number(ab,i))
