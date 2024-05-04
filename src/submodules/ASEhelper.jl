@@ -2,6 +2,7 @@ module ASEhelper
 
 using ..ACEmd
 using AtomsBase
+using Distributed
 using StaticArrays
 using Unitful
 
@@ -20,7 +21,7 @@ function make_system(
     pbc
 )
     atoms = [ Atom(Symbol(s), SVector(r...) *u"Å" ) for (s, r) in zip(atom_symbols, eachrow(positions))  ]
-    box = [ [cell[1], 0., 0.], [0., cell[2], 0.], [0., 0., cell[3]]  ]u"Å"
+    box = collect( eachrow(Matrix(cell)*u"Å") )
     periodic = [ x ? Periodic() : DirichletZero() for x in pbc ]
     sys = FlexibleSystem(atoms, box, periodic)
     return sys
@@ -34,7 +35,7 @@ function ase_energy(
     pbc,  
 )
     sys = make_system(atom_symbols, positions, cell, pbc)
-    e = ace_energy(potential, sys)
+    e = fetch( @spawn ace_energy(potential, sys) )
     return ustrip(u"eV", e)
 end
 
@@ -46,7 +47,7 @@ function ase_forces(
     pbc,  
 )
     sys = make_system(atom_symbols, positions, cell, pbc)
-    f = ace_forces(potential, sys)
+    f = fetch( @spawn ace_forces(potential, sys) )
     fm = reinterpret(reshape, typeof(1.0*unit(f[1][1])), f)
     return ustrip.(u"eV/Å", fm)'  # we need transpose for python
 end
@@ -59,7 +60,7 @@ function ase_virial(
     pbc,  
 )
     sys = make_system(atom_symbols, positions, cell, pbc)
-    v = ace_virial(potential, sys)
+    v = fetch( @spawn ace_virial(potential, sys) )
     return ustrip.(u"eV", v)'  # we need transpose for python
 end
 
@@ -71,7 +72,7 @@ function ase_energy_forces_virial(
     pbc,
 )
     sys = make_system(atom_symbols, positions, cell, pbc)
-    tmp = ace_energy_forces_virial(potential, sys)
+    tmp = fetch( @spawn ace_energy_forces_virial(potential, sys) )
     f = tmp["forces"]
     fm = reinterpret(reshape, typeof(1.0*unit(f[1][1])), f)
     e = tmp["energy"]
