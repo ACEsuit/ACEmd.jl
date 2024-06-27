@@ -189,7 +189,7 @@ function ace_virial(V, at;
     vir = Folds.sum( domain, executor ) do i
         j, R, Z = neigsz(nlist, at, i)
         _, tmp = ace_evaluate_d(V, R, Z, _atomic_number(at,i))
-        site_virial = -sum( zip(R, tmp.dV) ) do (Rⱼ, dVⱼ)
+        site_virial = -sum( zip(R, tmp.dV); init=SMatrix{3,3}(zeros(Float64, 3,3)) ) do (Rⱼ, dVⱼ)
             dVⱼ * Rⱼ'
         end
         site_virial
