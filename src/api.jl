@@ -233,7 +233,7 @@ end
 
 function ace_forces_virial(pot::ACEpotential, data; kwargs...)
     tmp = map( pot.potentials ) do pot
-        Threads.@spawn _ace_forces_virial( pot, data, kwargs...)
+        Threads.@spawn _ace_forces_virial( pot, data; kwargs...)
     end
     F_V = sum( tmp ) do t
         f, v = fetch(t)
@@ -272,7 +272,7 @@ function _ace_forces_virial(
             f[j] -= tmp.dV
             f[i] += sum(tmp.dV)
 
-            virial_sum -= sum( zip(R, tmp.dV) ) do (Rⱼ, dVⱼ)
+            virial_sum -= sum( zip(R, tmp.dV); init=SMatrix{3,3}(zeros(Float64, 3,3)) ) do (Rⱼ, dVⱼ)
                 dVⱼ * Rⱼ'
             end
         end
