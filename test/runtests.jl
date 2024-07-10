@@ -3,9 +3,8 @@ using ACE1
 using ACE1x
 using ACEfit
 using AtomsBase
-using AtomsCalculators.AtomsCalculatorsTesting
+using AtomsCalculators.Testing
 using ExtXYZ
-using Molly
 using Unitful
 using UnitfulAtomic
 using Test
@@ -150,22 +149,6 @@ end
     @test ace_fv[:virial] ≈ V
 end
 
-@testset "Molly support" begin
-    pot = load_ace_model(fname_ace)
-    data = ExtXYZ.Atoms(read_frame(fname_xyz))
-
-    sys = Molly.System(data, pot)
-    
-    @test ace_energy(pot, data)  ≈ Molly.potential_energy(sys)
-    @test all( ace_forces(pot, data) .≈ Molly.forces(sys) )
-
-    simulator = VelocityVerlet(
-        dt=1.0u"fs",
-        coupling=AndersenThermostat(300u"K", 1.0u"ps"),
-    )
-    simulate!(sys, simulator, 10)
-end 
-
 
 @testset "ACEfit extension" begin
     data = ExtXYZ.load(fname_train)
@@ -219,7 +202,5 @@ end
     pot = load_ace_model(fname_ace)
     data = ExtXYZ.load(fname_xyz)
 
-    test_potential_energy(data, pot)
-    test_forces(data, pot)
-    test_virial(data, pot)
+    test_energy_forces_virial(data, pot)
 end

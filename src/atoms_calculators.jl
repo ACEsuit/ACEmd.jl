@@ -1,4 +1,7 @@
 
+AtomsCalculators.energy_unit(ace::ACEpotential) = ace.energy_unit
+AtomsCalculators.length_unit(ace::ACEpotential) = ace.length_unit
+
 
 AtomsCalculators.@generate_interface function AtomsCalculators.potential_energy(
     system,
