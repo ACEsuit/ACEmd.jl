@@ -1,7 +1,7 @@
 name = "ACEmd"
 uuid = "69e0c927-b120-467d-b2b3-5b6842148cf4"
 authors = ["Teemu Järvinen <teemu.j.jarvinen@gmail.com> and contributors"]
-version = "0.1.15"
+version = "0.1.16"
 
 
 [deps]
@@ -34,7 +34,7 @@ ACEmd_ACEfit_ext = "ACEfit"
 ACE1 = "0.12.1"
 ACE1x = "0.1.8"
 ACEbase = "0.4.3"
-ACEfit = "0.1.4"
+ACEfit = "0.1.4, 0.2.0"
 AtomsBase = "0.3"
 AtomsCalculators = "0.2"
 ChunkSplitters = "2"
