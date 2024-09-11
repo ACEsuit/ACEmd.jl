@@ -61,7 +61,7 @@ end
 @testset "AtomsBase" begin
     pot = load_ace_model(fname_ace)
     julip_data = read_extxyz(fname_xyz)[end]
-    ab_data = FastSystem(ExtXYZ.Atoms(read_frame(fname_xyz)))
+    ab_data = ExtXYZ.Atoms(read_frame(fname_xyz))
 
     @test ace_energy(pot, julip_data) ≈ ace_energy(pot, ab_data)
     @test all( ace_forces(pot, julip_data) .≈ ace_forces(pot, ab_data) )
@@ -104,7 +104,7 @@ end
 
 @testset "Units" begin
     pot = load_ace_model(fname_ace; energy_unit=u"eV", length_unit=u"pm")
-    data = FastSystem(ExtXYZ.Atoms(read_frame(fname_xyz)))
+    data = ExtXYZ.Atoms(read_frame(fname_xyz))
 
     @test unit( ace_energy(pot, data) ) == u"eV"
     @test unit( ace_forces(pot, data)[1][1] ) == u"eV" / u"pm"
@@ -128,7 +128,7 @@ end
 
 @testset "Combination interface" begin
     pot = load_ace_model(fname_ace)
-    data = FastSystem(ExtXYZ.Atoms(read_frame(fname_xyz)))
+    data = ExtXYZ.Atoms(read_frame(fname_xyz))
 
     E = ace_energy(pot, data)
     F = ace_forces(pot, data)
