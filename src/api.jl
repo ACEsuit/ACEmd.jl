@@ -130,7 +130,7 @@ function ace_forces(
     kwargs...
 )   
     nlist = neighborlist(at, get_cutoff(V; cutoff_unit=cutoff_unit) )
-    F = Folds.sum( collect(chunks(domain, ntasks)), executor ) do (sub_domain, _)
+    F = Folds.sum( collect(chunks(domain; n=ntasks)), executor ) do sub_domain
         f = zeros(SVector{3, Float64}, length(at))
         for i in sub_domain
             j, R, Z = neigsz(nlist, at, i)
@@ -262,7 +262,7 @@ function _ace_forces_virial(
     kwargs...
 )
     nlist = neighborlist(at, get_cutoff(V; cutoff_unit=cutoff_unit) )
-    F_V = Folds.sum( collect(chunks(domain, ntasks)), executor ) do (sub_domain, _)
+    F_V = Folds.sum( collect(chunks(domain; n=ntasks)), executor ) do sub_domain
         f = zeros(SVector{3, Float64}, length(at))
         virial_sum = zeros(SMatrix{3,3,Float64})
         for i in sub_domain
@@ -350,7 +350,7 @@ function ace_forces(
     kwargs...
 )   
     nlist = neighborlist(at, get_cutoff(basis; cutoff_unit=cutoff_unit) )
-    F = Folds.sum( collect(chunks(domain, ntasks)), executor ) do (d, _)
+    F = Folds.sum( collect(chunks(domain; n=ntasks)), executor ) do d
         ace_forces(basis, at, nlist; domain=d)
     end
     return [ Vector(f) for f in eachrow(F)]
@@ -390,7 +390,7 @@ function ace_forces(
 )   
     nlist = neighborlist(at, get_cutoff(pair_basis; cutoff_unit=cutoff_unit) )
     pair_data = [ (i, j, R)  for (i,j,R) in pairs(nlist) if i in domain ]
-    F = Folds.sum( collect(chunks(pair_data, ntasks)), executor ) do (d, _)
+    F = Folds.sum( collect(index_chunks(pair_data; n=ntasks)), executor ) do d
         ace_forces(pair_basis, at, pair_data, d)
     end
     return [ Vector(f) for f in eachrow(F)]
@@ -464,8 +464,8 @@ function ace_virial(
 )   
     nlist = neighborlist(at, get_cutoff(pair_basis; cutoff_unit=cutoff_unit) )
     pair_data = [ (i, j, R)  for (i,j,R) in pairs(nlist) if i in domain ]
-    vir = Folds.sum( collect(chunks(pair_data, ntasks)), executor ) do (d, _)
-        ace_virial(pair_basis, at, pair_data, d)
+    vir = Folds.sum( collect(index_chunks(pair_data; n=ntasks)), executor ) do sdom
+        ace_virial(pair_basis, at, pair_data, sdom)
     end
     return vir
 end
@@ -538,7 +538,7 @@ function ace_forces_virial(
     kwargs...
 )   
     nlist = neighborlist(at, get_cutoff(basis; cutoff_unit=cutoff_unit) )
-    F_and_V = Folds.sum( collect(chunks(domain, ntasks)), executor ) do (d, _)
+    F_and_V = Folds.sum( collect(chunks(domain; n=ntasks)), executor ) do d
         f, v = ace_forces_virial(basis, at, nlist; domain=d)
         [f, v]
     end
@@ -587,7 +587,7 @@ function ace_forces_virial(
 )   
     nlist = neighborlist(at, get_cutoff(pair_basis; cutoff_unit=cutoff_unit) )
     pair_data = [ (i, j, R)  for (i,j,R) in pairs(nlist) if i in domain ]
-    F_and_V = Folds.sum( collect(chunks(pair_data, ntasks)), executor ) do (d, _)
+    F_and_V = Folds.sum( collect(index_chunks(pair_data; n=ntasks)), executor ) do d
        f, v = ace_forces_virial(pair_basis, at, pair_data, d)
        [f, v]
     end
