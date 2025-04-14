@@ -24,7 +24,7 @@ function Molly.System(
     atoms_data = [ Molly.AtomData(; element=String(atomic_symbol(sys,i))) for i in 1:length(sys)]
 
     boundary = begin
-        box = bounding_box(sys)
+        box = cell_vectors(sys)
         if isdiag( hcat(box...) )
            tmp = CubicBoundary(box[1][1], box[2][2], box[3][3])
         else
