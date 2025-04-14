@@ -27,7 +27,7 @@ ACEfit = "ad31a8ef-59f5-4a01-b543-a85c2f73e95c"
 Molly = "aa0f7f06-fcc0-5ec4-a7f3-a573f33f9c4c"
 
 [extensions]
-ACE_Molly_ext = "Molly"
+ACEmd_Molly_ext = "Molly"
 ACEmd_ACEfit_ext = "ACEfit"
 
 [compat]

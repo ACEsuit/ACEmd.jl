@@ -1,6 +1,6 @@
-module ACE_Molly_ext
+module ACEmd_Molly_ext
 
-import ACE1: AtomicNumber
+#import ACE1: AtomicNumber
 using ACEmd
 using AtomsBase
 using LinearAlgebra: isdiag
@@ -20,7 +20,7 @@ function Molly.System(
     @assert dimension(force_units) == dimension(u"kg*m/s^2")  "force unit has wrong dimenstions"
     @assert dimension(velocity_units) == dimension(u"m/s")  "velocity unit has wrong dimenstions"
 
-    atoms = [Molly.Atom(; index=i, mass=atomic_mass(sys, i) ) for i in 1:length(sys) ]
+    atoms = [Molly.Atom(; index=i, mass=AtomsBase.mass(sys, i) ) for i in 1:length(sys) ]
     atoms_data = [ Molly.AtomData(; element=String(atomic_symbol(sys,i))) for i in 1:length(sys)]
 
     boundary = begin

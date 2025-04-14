@@ -204,3 +204,5 @@ end
 
     test_energy_forces_virial(data, pot)
 end
+
+include("molly_tests.jl")
