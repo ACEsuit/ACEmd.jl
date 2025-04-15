@@ -33,7 +33,7 @@ end
 
 function ace_energy(V::ACE1.OneBody, as::AbstractSystem; domain=1:length(as), energy_unit=default_energy, kwargs...)
     E = sum( domain ) do i
-        ACE1.evaluate(V, atomic_symbol(as, i) )
+        ACE1.evaluate(V, (Symbol ∘ species)(as, i) )
     end
     return E * energy_unit
 end
