@@ -34,7 +34,7 @@ vel = random_velocities(sys, temp)
 sys = Molly.System(
     sys;
     velocities = vel,
-    loggers=(temp=TemperatureLogger(100),)
+    loggers=(temp=TemperatureLogger(100),coords=CoordinateLogger(100))
 )
 
 # Set up simulator
@@ -45,5 +45,35 @@ simulator = VelocityVerlet(
 
 
 # Perform MD
-simulate!(sys, simulator, 1000)
+@time simulate!(sys, simulator, 30_000)
 ```
+
+7775.936176 seconds (90.90 G allocations: 4.037 TiB, 9.11% gc time, 0.02% compilation time) 
+
+```julia
+# Plot temperature
+using Plots
+plot(ustrip.(sys.loggers.temp.history)[end-175:end], c="blue", linewidth=3, label=:none, ylabel="Temperature", xlabel="Steps")
+savefig("Temp_TiAl_ace_md.png")
+```
+
+<img src="../../data/Temp_TiAl_ace_md.png" width = "360" height = "270" />
+
+
+```julia
+# Save the trajectory to the .xyz file
+using JuLIP
+at0 = read_extxyz(fname_xyz)[1]
+AT = JuLIP.Atoms{Float64}[];
+for X in sys.loggers.coords.history
+    # units transform
+    Xn = ustrip.(X) * 10
+    at = JuLIP.Atoms(:X, Xn, cell=copy(at0.cell), pbc=true, M=copy(at0.M), Z=copy(at0.Z))
+    push!(AT, at)
+end
+write_extxyz("TiAl_ace_md.xyz", AT)
+```
+
+Open this .xyz file in [Ovito](https://www.ovito.org/) and then export the following animation.
+
+<img src="../../data/TiAl_ace_md.gif" width = "300" height = "400" />
